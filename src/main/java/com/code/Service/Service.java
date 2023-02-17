@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 
 
+import java.sql.Date;
 import java.util.List;
 
 @AllArgsConstructor
@@ -44,8 +45,39 @@ public class Service {
     public String createGroup(Integer uid, String groupTitle, String groupDetail) {
 
         String inviteCode = RandomStringUtils.randomAlphabetic(10); //랜덤 문자열 생성 : 초대코드
-        groupRepository.createList(inviteCode, uid, groupTitle, groupDetail);   //그룹 생성
+        groupRepository.createGroup(inviteCode, uid, groupTitle, groupDetail);   //그룹 생성
         return groupRepository.getInviteCode(); //초대코드 반환
     }
+
+    //API4 : 출석 코드 생성 : GROUP Table update
+    public void putAttendanceCode(Integer gid, Date acceptStartTime, Date acceptEndTime) {
+        String attendanceCode = RandomStringUtils.randomAlphabetic(5); //랜덤 문자열 생성 : 출석코드
+        groupRepository.putAttendanceCode(attendanceCode, gid);   //출석 코드 update
+        groupRepository.updateCodeState(gid);
+        groupRepository.insertCode(gid, attendanceCode, acceptStartTime, acceptEndTime);
+
+    }
+
+    //API5 : 출석 코드 조회
+    public String getAttendanceCode(Integer gid) {
+        return groupRepository.getAttendanceCode(gid);
+    }
+
+    //API6 : 자신이 참여한 그룹 리스트 조회
+    public List<Group> getJoinedGroupList(Integer userId) {
+        return groupRepository.getJoinedGroupList(userId);
+    }
+//
+//  //API7 : 접속한 그룹 정보 조회
+    public Group getGroupInfo(Integer gid) {
+        return groupRepository.getGroupInfo(gid);
+    }
+
+    //API8 : 사용자의 출석 상태 update
+//    public void updateUserAttendance(Integer userId) {
+//        groupRepository.insertHistory(Integer userId);
+//        groupRepository.updateUserAttendance(userId);
+//    }
+
     //----------------------Project API------------------------
 }
