@@ -22,7 +22,6 @@ public interface GroupRepository extends JpaRepository<Group, Integer> {
     public List<Group> getGroupList(@Param("uid") Integer uid);
 
 
-
     //API2 + API3 : 그룹 생성 & 초대코드 return
     @Modifying
     @Query(value = "INSERT INTO attendance_web_db.group " +
