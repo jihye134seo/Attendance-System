@@ -7,9 +7,9 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.cglib.core.Local;
 
-import java.sql.Date;
-import java.text.DateFormat;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -17,37 +17,35 @@ import java.text.DateFormat;
 @Entity
 public class AttendanceCodeApi {
 
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer gid;
+    private LocalDateTime acceptStartTime;
+    private LocalDateTime acceptEndTime;
+
+
     public Integer getGid() {
         return gid;
     }
-
     public void setGid(Integer GID) {
         this.gid = GID;
     }
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
 
-    private Integer gid;
-
-    public Date getAcceptStartTime() {
+    public LocalDateTime getAcceptStartTime() {
         return acceptStartTime;
     }
-
-    public void setAcceptStartTime(Date acceptStartTime) {
+    public void setAcceptStartTime(LocalDateTime acceptStartTime) {
         this.acceptStartTime = acceptStartTime;
     }
 
-    public Date getAcceptEndTime() {
+
+    public LocalDateTime getAcceptEndTime() {
         return acceptEndTime;
     }
-
-    public void setAcceptEndTime(Date acceptEndTime) {
+    public void setAcceptEndTime(LocalDateTime acceptEndTime) {
         this.acceptEndTime = acceptEndTime;
     }
-
-    private Date acceptStartTime;
-    private Date acceptEndTime;
-
 
 }

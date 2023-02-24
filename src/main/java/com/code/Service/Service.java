@@ -7,9 +7,10 @@ import com.code.Repository.UserRepository;
 import lombok.AllArgsConstructor;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.cglib.core.Local;
 
+import java.time.LocalDateTime;
 
-import java.sql.Date;
 import java.util.List;
 
 @AllArgsConstructor
@@ -50,8 +51,8 @@ public class Service {
     }
 
     //API4 : 출석 코드 생성 : GROUP Table update
-    public void putAttendanceCode(Integer gid, Date acceptStartTime, Date acceptEndTime) {
-        String attendanceCode = RandomStringUtils.randomAlphabetic(5); //랜덤 문자열 생성 : 출석코드
+    public void putAttendanceCode(Integer gid, LocalDateTime acceptStartTime, LocalDateTime acceptEndTime) {
+       String attendanceCode = RandomStringUtils.randomAlphabetic(5); //랜덤 문자열 생성 : 출석코드
         groupRepository.putAttendanceCode(attendanceCode, gid);   //출석 코드 update
         groupRepository.updateCodeState(gid);
         groupRepository.insertCode(gid, attendanceCode, acceptStartTime, acceptEndTime);
@@ -67,8 +68,8 @@ public class Service {
     public List<Group> getJoinedGroupList(Integer userId) {
         return groupRepository.getJoinedGroupList(userId);
     }
-//
-//  //API7 : 접속한 그룹 정보 조회
+
+    //API7 : 접속한 그룹 정보 조회
     public Group getGroupInfo(Integer gid) {
         return groupRepository.getGroupInfo(gid);
     }
