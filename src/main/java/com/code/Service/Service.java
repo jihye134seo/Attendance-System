@@ -10,6 +10,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @AllArgsConstructor
@@ -50,7 +51,7 @@ public class Service {
     }
 
     //API4 : 출석 코드 생성 : GROUP Table update
-    public void putAttendanceCode(Integer gid, Date acceptStartTime, Date acceptEndTime) {
+    public void putAttendanceCode(Integer gid, LocalDateTime acceptStartTime, Date acceptEndTime) {
         String attendanceCode = RandomStringUtils.randomAlphabetic(5); //랜덤 문자열 생성 : 출석코드
         groupRepository.putAttendanceCode(attendanceCode, gid);   //출석 코드 update
         groupRepository.updateCodeState(gid);

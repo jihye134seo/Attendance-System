@@ -8,6 +8,9 @@ import com.code.Service.Service;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -51,6 +54,8 @@ public class Controller {
     @PutMapping(value = "/api/attendance")
     public void putAttendanceCode(@RequestBody AttendanceCodeApi attendanceCodeApi) {
         service.putAttendanceCode(attendanceCodeApi.getGid(), attendanceCodeApi.getAcceptStartTime(), attendanceCodeApi.getAcceptEndTime());
+
+        System.out.println(attendanceCodeApi.getAcceptStartTime());
     }
 
     //API5 : 출석 코드 조회

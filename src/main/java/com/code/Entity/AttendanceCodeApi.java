@@ -7,9 +7,12 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.cglib.core.Local;
 
 import java.sql.Date;
 import java.text.DateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -30,11 +33,11 @@ public class AttendanceCodeApi {
 
     private Integer gid;
 
-    public Date getAcceptStartTime() {
+    public LocalDateTime getAcceptStartTime() {
         return acceptStartTime;
     }
 
-    public void setAcceptStartTime(Date acceptStartTime) {
+    public void setAcceptStartTime(LocalDateTime acceptStartTime) {
         this.acceptStartTime = acceptStartTime;
     }
 
@@ -46,7 +49,7 @@ public class AttendanceCodeApi {
         this.acceptEndTime = acceptEndTime;
     }
 
-    private Date acceptStartTime;
+    private LocalDateTime acceptStartTime;
     private Date acceptEndTime;
 
 
