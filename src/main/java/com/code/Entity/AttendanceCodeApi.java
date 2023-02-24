@@ -9,9 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.cglib.core.Local;
 
-import java.sql.Date;
-import java.text.DateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -20,37 +17,35 @@ import java.time.LocalDateTime;
 @Entity
 public class AttendanceCodeApi {
 
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer gid;
+    private LocalDateTime acceptStartTime;
+    private LocalDateTime acceptEndTime;
+
+
     public Integer getGid() {
         return gid;
     }
-
     public void setGid(Integer GID) {
         this.gid = GID;
     }
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-
-    private Integer gid;
 
     public LocalDateTime getAcceptStartTime() {
         return acceptStartTime;
     }
-
     public void setAcceptStartTime(LocalDateTime acceptStartTime) {
         this.acceptStartTime = acceptStartTime;
     }
 
-    public Date getAcceptEndTime() {
+
+    public LocalDateTime getAcceptEndTime() {
         return acceptEndTime;
     }
-
-    public void setAcceptEndTime(Date acceptEndTime) {
+    public void setAcceptEndTime(LocalDateTime acceptEndTime) {
         this.acceptEndTime = acceptEndTime;
     }
-
-    private LocalDateTime acceptStartTime;
-    private Date acceptEndTime;
-
 
 }

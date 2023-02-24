@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Date;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -48,7 +48,7 @@ public interface GroupRepository extends JpaRepository<Group, Integer> {
     @Query(value = "INSERT INTO `attendance_web_db`.`code` " +
             "(gid, attendanceCode, acceptStartTime, acceptEndtime, state) " +
             "VALUES (:gid, :attendance_code, :acceptStartTime, :acceptEndTime, 'a')", nativeQuery = true)
-    void insertCode(Integer gid, String attendance_code, LocalDateTime acceptStartTime, Date acceptEndTime);
+    void insertCode(Integer gid, String attendance_code, LocalDateTime acceptStartTime, LocalDateTime acceptEndTime);
 
 
     //API5 : 출석 코드 조회
