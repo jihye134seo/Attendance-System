@@ -74,11 +74,13 @@ public class Service {
         return groupRepository.getGroupInfo(gid);
     }
 
+
+
+
     //API8 : 사용자의 출석 상태 update
-//    public void updateUserAttendance(Integer userId) {
-//        groupRepository.insertHistory(Integer userId);
-//        groupRepository.updateUserAttendance(userId);
-//    }
+    public void insertUserAttendance(String guid, LocalDateTime enterTime, String attendanceCode) {
+        groupRepository.insertUserAttendance(guid, enterTime, attendanceCode);
+    }
 
     //----------------------Project API------------------------
 }

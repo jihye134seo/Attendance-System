@@ -72,10 +72,10 @@ public interface GroupRepository extends JpaRepository<Group, Integer> {
 
 
     //API8 : 사용자의 출석 상태 update
-//    @Modifying
-//    @Query(value = "INSERT INTO attendance_web_db.group " +
-//            "(`gid`, `attendance_code`, `group_detail`, `create_date`, `master_uid`, `head_count`) " +
-//            "VALUES (:invite_code, :groupTitle, :groupDetail, now(), :uid, 1)", nativeQuery = true)
-//    void updateUserAttendance(Integer userId);
+    @Modifying
+    @Query(value = "INSERT INTO attendance_web_db.history " +
+            "(`guid`, `enter_time`, `generate_time`, `attendance_code`) " +
+            "VALUES (:guid, :enterTime, now(), :attendanceCode)", nativeQuery = true)
+    void insertUserAttendance(String guid, LocalDateTime enterTime, String attendanceCode);
 
 }
