@@ -68,7 +68,7 @@ public class Controller {
         return service.getGroupInfo(Integer.parseInt(gid));
     }
 
-    //API8 : 사용자의 출석 상태 update
+    //API8 : 사용자의 출석 상태 Insert
     @PutMapping (value = "/api/user/attendance")
     public void insertUserAttendance(@RequestBody AttendanceUserApi attendanceUserApi) {
         service.insertUserAttendance(attendanceUserApi.getGuid(), attendanceUserApi.getEnter_time(), attendanceUserApi.getAttendance_code());
@@ -76,6 +76,14 @@ public class Controller {
 
 
     //----------------------Project API------------------------
+
+
+
+
+
+
+
+
 
 
 }

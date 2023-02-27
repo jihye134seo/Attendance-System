@@ -71,7 +71,7 @@ public interface GroupRepository extends JpaRepository<Group, Integer> {
 
 
 
-    //API8 : 사용자의 출석 상태 update
+    //API8 : 사용자의 출석 상태 Insert
     @Modifying
     @Query(value = "INSERT INTO attendance_web_db.history " +
             "(`guid`, `enter_time`, `generate_time`, `attendance_code`) " +
