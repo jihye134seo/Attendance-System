@@ -1,16 +1,9 @@
 package com.code.Controller;
 
-import com.code.Entity.AttendanceCodeApi;
-import com.code.Entity.User;
-import com.code.Entity.Group;
-import com.code.Entity.GroupApi;
+import com.code.Entity.*;
 import com.code.Service.Service;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 import java.util.List;
 
@@ -75,14 +68,22 @@ public class Controller {
         return service.getGroupInfo(Integer.parseInt(gid));
     }
 
-    //API8 : 사용자의 출석 상태 update
-//    @GetMapping(value = "/api/user/{uid}/attendance")
-//    public void updateUserAttendance(@PathVariable String uid) {
-//        service.updateUserAttendance(Integer.parseInt(uid));
-//    }
+    //API8 : 사용자의 출석 상태 Insert
+    @PutMapping (value = "/api/user/attendance")
+    public void insertUserAttendance(@RequestBody AttendanceUserApi attendanceUserApi) {
+        service.insertUserAttendance(attendanceUserApi.getGuid(), attendanceUserApi.getEnter_time(), attendanceUserApi.getAttendance_code());
+    }
 
 
     //----------------------Project API------------------------
+
+
+
+
+
+
+
+
 
 
 }
