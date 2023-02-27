@@ -2,7 +2,7 @@ package com.code.Entity;
 
 import java.time.LocalDateTime;
 
-public class AttendanceUserApi {
+public class AttendanceInsertApi {
 
     private String guid;
     private LocalDateTime enter_time;

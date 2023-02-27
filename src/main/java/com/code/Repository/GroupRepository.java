@@ -77,5 +77,22 @@ public interface GroupRepository extends JpaRepository<Group, Integer> {
             "(`guid`, `enter_time`, `generate_time`, `attendance_code`) " +
             "VALUES (:guid, :enterTime, now(), :attendanceCode)", nativeQuery = true)
     void insertUserAttendance(String guid, LocalDateTime enterTime, String attendanceCode);
+    @Modifying
+    @Query(value = "UPDATE `attendance_web_db`.`group_user` SET `hid` = (SELECT LAST_INSERT_ID()) WHERE (`guid` = :guid)", nativeQuery = true)
+    void updateHid(String guid);
+
+    //API9 : 사용자의 출석 상태 Update
+    @Modifying
+    @Query(value = "UPDATE `attendance_web_db`.`history` SET `exit_time` = :exitTime, `attendance_state` = 'P' WHERE `hid` = (select hid from attendance_web_db.group_user where guid = :guid )", nativeQuery = true)
+    void updateUserAttendance(String guid, LocalDateTime exitTime);
+
+
+
+    //API10 : 그룹 참가
+    @Modifying
+    @Query(value = "INSERT INTO attendance_web_db.group_user " +
+            "(`uid`, `gid`, `present_state`) " +
+            "VALUES (:uid, (select gid from attendance_web_db.group g where g.invite_code = :userCode), 'Y')", nativeQuery = true)
+    void insertGroupUser(Integer uid, String userCode);
 
 }

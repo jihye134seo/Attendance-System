@@ -80,6 +80,15 @@ public class Service {
     //API8 : 사용자의 출석 상태 Insert
     public void insertUserAttendance(String guid, LocalDateTime enterTime, String attendanceCode) {
         groupRepository.insertUserAttendance(guid, enterTime, attendanceCode);
+        groupRepository.updateHid(guid);
+    }
+
+    public void updateUserAttendance(String guid, LocalDateTime exitTime) {
+        groupRepository.updateUserAttendance(guid, exitTime);
+    }
+
+    public void insertGroupUser(Integer uid, String userCode) {
+        groupRepository.insertGroupUser(uid, userCode);
     }
 
     //----------------------Project API------------------------
