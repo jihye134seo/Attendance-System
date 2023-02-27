@@ -5,6 +5,7 @@ import com.code.Service.Service;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -69,10 +70,26 @@ public class Controller {
     }
 
     //API8 : 사용자의 출석 상태 Insert
-    @PutMapping (value = "/api/user/attendance")
-    public void insertUserAttendance(@RequestBody AttendanceUserApi attendanceUserApi) {
-        service.insertUserAttendance(attendanceUserApi.getGuid(), attendanceUserApi.getEnter_time(), attendanceUserApi.getAttendance_code());
+    @PostMapping(value = "/api/user/attendance")
+    public void insertUserAttendance(@RequestBody AttendanceInsertApi attendanceInsertApi) {
+        service.insertUserAttendance(attendanceInsertApi.getGuid(), attendanceInsertApi.getEnter_time(), attendanceInsertApi.getAttendance_code());
     }
+
+
+    //API9 : 사용자의 출석 상태 Update
+    @PatchMapping(value = "/api/user/attendance")
+    public void updateUserAttendance(@RequestBody AttendanceUpdateApi attendanceUpdateApi) {
+        service.updateUserAttendance(attendanceUpdateApi.getGuid(), attendanceUpdateApi.getExit_time());
+    }
+
+
+    //API10 : 그룹 참가
+    @ResponseBody
+    @PostMapping(value = "/api/group/join")
+    public void insertGroupUser(@RequestBody InsertUserGroupApi insertUserGroupApi) {
+        service.insertGroupUser(insertUserGroupApi.getUid(), insertUserGroupApi.getInvite_code());
+    }
+
 
 
     //----------------------Project API------------------------
