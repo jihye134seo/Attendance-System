@@ -59,7 +59,7 @@ public class Controller {
 
     //API6 : 자신이 참여한 그룹 리스트 조회
     @GetMapping(value = "/api/user/{uid}/groups/joined")
-    public List<Group> getJoinedGroupList(@PathVariable String uid) {
+    public List<API6Response> getJoinedGroupList(@PathVariable String uid) {
         return service.getJoinedGroupList(Integer.parseInt(uid));
     }
 

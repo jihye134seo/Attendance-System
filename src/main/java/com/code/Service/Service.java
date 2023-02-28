@@ -1,5 +1,6 @@
 package com.code.Service;
 
+import com.code.Entity.API6Response;
 import com.code.Entity.User;
 import com.code.Repository.GroupRepository;
 import com.code.Entity.Group;
@@ -65,12 +66,7 @@ public class Service {
     }
 
     //API6 : 자신이 참여한 그룹 리스트 조회
-    public List<Group> getJoinedGroupList(Integer userId) {
-        return groupRepository.getJoinedGroupList(userId);
-    }
-
-    //API7 : 접속한 그룹 정보 조회
-    public Group getGroupInfo(Integer gid) {
+    public List<API6Response> getJoinedGroupList(Integer userId) {
         return groupRepository.getGroupInfo(gid);
     }
 

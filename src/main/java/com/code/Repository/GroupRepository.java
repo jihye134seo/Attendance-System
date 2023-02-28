@@ -1,5 +1,6 @@
 package com.code.Repository;
 
+import com.code.Entity.API6Response;
 import com.code.Entity.Group;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 
 @Transactional
@@ -57,13 +59,12 @@ public interface GroupRepository extends JpaRepository<Group, Integer> {
 
 
     //API6 : 자신이 참여한 그룹 리스트 조회
-    @Query(value = "SELECT *" +
+    @Query(value = "SELECT gu.guid, g.*" +
                     "FROM attendance_web_db.group g " +
-                    "WHERE g.gid in (" +
-                                "SELECT gu.gid " +
-                                "FROM attendance_web_db.group_user gu " +
-                                "WHERE gu.uid = :userId)", nativeQuery = true)
-    List<Group> getJoinedGroupList(Integer userId);
+                    "INNER JOIN attendance_web_db.group_user gu " +
+                    "ON + g.gid = gu.gid " +
+                    "WHERE gu.uid = :userId ", nativeQuery = true)
+    List<Object[]> getJoinedGroupList(Integer userId);
 
     //API7 : 접속한 그룹 정보 조회
     @Query(value = "SELECT * FROM attendance_web_db.group g where g.gid = :gid", nativeQuery = true)
