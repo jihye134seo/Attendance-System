@@ -8,10 +8,18 @@ import com.code.Repository.UserRepository;
 import lombok.AllArgsConstructor;
 
 import org.apache.commons.lang3.RandomStringUtils;
+//import org.apache.tomcat.util.json.JSONParser;
+//import org.apache.tomcat.util.json.ParseException;
+//import org.h2.util.json.JSONObject;
 import org.springframework.cglib.core.Local;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.time.LocalDateTime;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -67,10 +75,27 @@ public class Service {
 
     //API6 : 자신이 참여한 그룹 리스트 조회
     public List<API6Response> getJoinedGroupList(Integer userId) {
-        return groupRepository.getGroupInfo(gid);
+
+        var objLists = groupRepository.getJoinedGroupList(userId);
+
+        ArrayList<API6Response> result = new ArrayList<API6Response>();
+
+        for(int i=0; i < objLists.size(); i++){
+            var list = objLists.get(i);
+            result.add(new API6Response(
+                    (Integer)list[0], (Integer)list[1], (String)list[2],
+                    (String)list[3], (String)list[4], list[5].toString(),
+                    (Integer)list[6], (Integer)list[7], (String)list[8]
+            ));
+        }
+
+        return result;
     }
 
-
+    //API7 : 접속한 그룹 정보 조회
+    public Group getGroupInfo(Integer gid) {
+        return groupRepository.getGroupInfo(gid);
+    }
 
 
     //API8 : 사용자의 출석 상태 Insert

@@ -12,8 +12,6 @@ import java.sql.Date;
 import java.time.LocalDateTime;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 public class API6Response {
 
@@ -33,13 +31,20 @@ public class API6Response {
     private String invite_code;
     private String group_title;
     private String group_detail;
-    private LocalDateTime create_date;
+    private String create_date;
     private Integer master_uid;
-    private Integer head_count;
-    private String attendance_code;
 
-
-
+    public API6Response(Integer GUID, Integer GID, String invite_code, String group_title, String group_detail, String create_date, Integer master_uid, Integer head_count, String attendance_code) {
+        this.GUID = GUID;
+        this.GID = GID;
+        this.invite_code = invite_code;
+        this.group_title = group_title;
+        this.group_detail = group_detail;
+        this.create_date = create_date;
+        this.master_uid = master_uid;
+        this.head_count = head_count;
+        this.attendance_code = attendance_code;
+    }
 
     public Integer getGID() {
         return GID;
@@ -73,11 +78,11 @@ public class API6Response {
         this.group_detail = group_detail;
     }
 
-    public LocalDateTime getCreate_date() {
+    public String getCreate_date() {
         return create_date;
     }
 
-    public void setCreate_date(LocalDateTime create_date) {
+    public void setCreate_date(String create_date) {
         this.create_date = create_date;
     }
 
@@ -104,6 +109,11 @@ public class API6Response {
     public void setAttendance_code(String attendance_code) {
         this.attendance_code = attendance_code;
     }
+
+    private Integer head_count;
+    private String attendance_code;
+
+
 
 
 }

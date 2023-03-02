@@ -63,6 +63,7 @@ public class Controller {
         return service.getJoinedGroupList(Integer.parseInt(uid));
     }
 
+
     //API7 : 접속한 그룹 정보 조회
     @GetMapping(value = "/api/group/{gid}")
     public Group getGroupInfo(@PathVariable String gid) {

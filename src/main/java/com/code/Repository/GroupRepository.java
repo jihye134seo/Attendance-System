@@ -62,7 +62,7 @@ public interface GroupRepository extends JpaRepository<Group, Integer> {
     @Query(value = "SELECT gu.guid, g.*" +
                     "FROM attendance_web_db.group g " +
                     "INNER JOIN attendance_web_db.group_user gu " +
-                    "ON + g.gid = gu.gid " +
+                    "ON g.gid = gu.gid " +
                     "WHERE gu.uid = :userId ", nativeQuery = true)
     List<Object[]> getJoinedGroupList(Integer userId);
 
