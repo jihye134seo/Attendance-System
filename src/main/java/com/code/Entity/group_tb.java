@@ -8,43 +8,33 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import jakarta.persistence.Id;
 import java.sql.Date;
-import org.springframework.format.annotation.DateTimeFormat;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 //Group Table과 Mapping 됨
-public class Group {
+public class group_tb {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer GID;
-    private String invite_code;
+    private Integer gid;
     private String group_title;
     private String group_detail;
-    private Date create_date;
-    private Integer master_uid;
-    private Integer head_count;
+    private Integer leader_uid;
+    private String invite_code;
+    private Character availability;
     private String attendance_code;
+    private LocalDateTime create_date_time;
 
 
-
-
-    public Integer getGID() {
-        return GID;
+    public Integer getGid() {
+        return gid;
     }
 
-    public void setGID(Integer GID) {
-        this.GID = GID;
-    }
-
-    public String getInvite_code() {
-        return invite_code;
-    }
-
-    public void setInvite_code(String invite_code) {
-        this.invite_code = invite_code;
+    public void setGid(Integer gid) {
+        this.gid = gid;
     }
 
     public String getGroup_title() {
@@ -63,28 +53,28 @@ public class Group {
         this.group_detail = group_detail;
     }
 
-    public Date getCreate_date() {
-        return create_date;
+    public Integer getLeader_uid() {
+        return leader_uid;
     }
 
-    public void setCreate_date(Date create_date) {
-        this.create_date = create_date;
+    public void setLeader_uid(Integer leader_uid) {
+        this.leader_uid = leader_uid;
     }
 
-    public Integer getMaster_uid() {
-        return master_uid;
+    public String getInvite_code() {
+        return invite_code;
     }
 
-    public void setMaster_uid(Integer master_uid) {
-        this.master_uid = master_uid;
+    public void setInvite_code(String invite_code) {
+        this.invite_code = invite_code;
     }
 
-    public Integer getHead_count() {
-        return head_count;
+    public Character getAvailability() {
+        return availability;
     }
 
-    public void setHead_count(Integer head_count) {
-        this.head_count = head_count;
+    public void setAvailability(Character availability) {
+        this.availability = availability;
     }
 
     public String getAttendance_code() {
@@ -95,5 +85,11 @@ public class Group {
         this.attendance_code = attendance_code;
     }
 
+    public LocalDateTime getCreate_date_time() {
+        return create_date_time;
+    }
 
+    public void setCreate_date_time(LocalDateTime create_date_time) {
+        this.create_date_time = create_date_time;
+    }
 }

@@ -5,7 +5,6 @@ import com.code.Service.Service;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -17,16 +16,7 @@ public class Controller {
     //------------------------실행 테스트-----------------------
     @GetMapping(value = "api/test")
     public String test() {
-        String json = "{name : 'icecream'}";
-        return json;
-    }
-    @GetMapping(value = "/api/user")
-    public List<User> getUserList() {
-        return service.getUserList();
-    }
-    @GetMapping(value = "/api/user/{userId}")
-    public String getUser(@PathVariable String userId) {
-        return service.getUser(Integer.parseInt(userId));
+        return "{name : 'icecream'}";
     }
     //------------------------실행 테스트-----------------------
 
@@ -34,7 +24,7 @@ public class Controller {
     //----------------------Project API------------------------
     //API1 : 사용자가 생성한 그룹 리스트 가져오기
     @GetMapping(value = "/api/user/{uid}/groups/created")
-    public List<Group> getGroupList(@PathVariable String uid) {
+    public List<group_tb> getGroupList(@PathVariable String uid) {
         return service.getGroupList(Integer.parseInt(uid));
     }
 
@@ -66,7 +56,7 @@ public class Controller {
 
     //API7 : 접속한 그룹 정보 조회
     @GetMapping(value = "/api/group/{gid}")
-    public Group getGroupInfo(@PathVariable String gid) {
+    public group_tb getGroupInfo(@PathVariable String gid) {
         return service.getGroupInfo(Integer.parseInt(gid));
     }
 

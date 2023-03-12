@@ -1,7 +1,6 @@
 package com.code.Repository;
 
-import com.code.Entity.API6Response;
-import com.code.Entity.Group;
+import com.code.Entity.group_tb;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -12,17 +11,16 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
 
 @Transactional
 @Repository
-public interface GroupRepository extends JpaRepository<Group, Integer> {
+public interface GroupRepository extends JpaRepository<group_tb, Integer> {
 
 
     //API1 : 사용자가 생성한 그룹 리스트 가져오기
     @Query(value = "SELECT * FROM attendance_web_db.group g where g.master_uid = :uid", nativeQuery = true)
-    public List<Group> getGroupList(@Param("uid") Integer uid);
+    public List<group_tb> getGroupList(@Param("uid") Integer uid);
 
 
 
@@ -68,7 +66,7 @@ public interface GroupRepository extends JpaRepository<Group, Integer> {
 
     //API7 : 접속한 그룹 정보 조회
     @Query(value = "SELECT * FROM attendance_web_db.group g where g.gid = :gid", nativeQuery = true)
-    Group getGroupInfo(Integer gid);
+    group_tb getGroupInfo(Integer gid);
 
 
 

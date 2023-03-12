@@ -1,9 +1,9 @@
 package com.code.Service;
 
 import com.code.Entity.API6Response;
-import com.code.Entity.User;
+import com.code.Entity.user_tb;
 import com.code.Repository.GroupRepository;
-import com.code.Entity.Group;
+import com.code.Entity.group_tb;
 import com.code.Repository.UserRepository;
 import lombok.AllArgsConstructor;
 
@@ -11,11 +11,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 //import org.apache.tomcat.util.json.JSONParser;
 //import org.apache.tomcat.util.json.ParseException;
 //import org.h2.util.json.JSONObject;
-import org.springframework.cglib.core.Local;
-
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import java.time.LocalDateTime;
 
@@ -30,7 +25,7 @@ public class Service {
     private GroupRepository groupRepository;
 
     //------------------------실행 테스트-----------------------
-    public List<User> getUserList() {
+    public List<user_tb> getUserList() {
         return userRepository.findAll();
     }
 
@@ -47,7 +42,7 @@ public class Service {
 
     //----------------------Project API------------------------
     //API1 : 사용자가 생성한 그룹 리스트 가져오기
-    public List<Group> getGroupList(Integer userId) {
+    public List<group_tb> getGroupList(Integer userId) {
         return groupRepository.getGroupList(userId);
     }
 
@@ -93,7 +88,7 @@ public class Service {
     }
 
     //API7 : 접속한 그룹 정보 조회
-    public Group getGroupInfo(Integer gid) {
+    public group_tb getGroupInfo(Integer gid) {
         return groupRepository.getGroupInfo(gid);
     }
 
