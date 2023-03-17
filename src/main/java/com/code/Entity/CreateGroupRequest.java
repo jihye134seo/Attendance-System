@@ -9,16 +9,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Entity
-public class GroupApi {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+@AllArgsConstructor
+
+public class CreateGroupRequest {
+
     private Integer uid;
     private String group_detail;
+    private String group_title;
 
     public Integer getUid() {
         return uid;
@@ -44,5 +42,5 @@ public class GroupApi {
         this.group_title = group_title;
     }
 
-    private String group_title;
+
 }

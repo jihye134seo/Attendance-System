@@ -11,8 +11,6 @@ import lombok.NoArgsConstructor;
 import java.sql.Date;
 import java.time.LocalDateTime;
 
-@Data
-@Entity
 public class API6Response {
 
 
@@ -24,8 +22,6 @@ public class API6Response {
         this.GUID = GUID;
     }
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer GUID;
     private Integer GID;
     private String invite_code;

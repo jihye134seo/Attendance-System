@@ -1,6 +1,8 @@
 package com.code.Repository;
 
 import com.code.Entity.group_tb;
+import com.code.Entity.history_tb;
+import com.code.Entity.user_and_history_tb;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -18,42 +20,57 @@ import java.util.List;
 public interface GroupRepository extends JpaRepository<group_tb, Integer> {
 
 
-    //API1 : 사용자가 생성한 그룹 리스트 가져오기
-    @Query(value = "SELECT * FROM attendance_web_db.group g where g.master_uid = :uid", nativeQuery = true)
-    public List<group_tb> getGroupList(@Param("uid") Integer uid);
+    //------------------------------API1 : 사용자가 생성한 그룹 리스트 가져오기------------------------------
+    @Query(value = "SELECT * FROM attender.group_tb g where g.leader_uid = :uid", nativeQuery = true)
+    List<group_tb> getGroupList(@Param("uid") Integer uid);
 
-
-
-    //API2 + API3 : 그룹 생성 & 초대코드 return
+    //---------------------------------API2 : 그룹 생성 & 초대코드 return ---------------------------------
     @Modifying
-    @Query(value = "INSERT INTO attendance_web_db.group " +
-            "(`invite_code`, `group_title`, `group_detail`, `create_date`, `master_uid`, `head_count`) " +
-            "VALUES (:invite_code, :groupTitle, :groupDetail, now(), :uid, 1)", nativeQuery = true)
+    @Query(value = "INSERT INTO attender.group_tb " +
+            "(`group_title`, `group_detail`, `leader_uid`, `invite_code`, `availability`, `create_date_time`) " +
+            "VALUES (:groupTitle, :groupDetail, :uid, :invite_code, 'Y', now())", nativeQuery = true)
     void createGroup(String invite_code, Integer uid, String groupTitle, String groupDetail);
-    @Query(value = "SELECT g.invite_code FROM attendance_web_db.group g WHERE g.gid = (SELECT LAST_INSERT_ID())", nativeQuery = true)
+    @Query(value = "SELECT g.invite_code FROM attender.group_tb g WHERE g.gid = (SELECT LAST_INSERT_ID())", nativeQuery = true)
     String getInviteCode();
 
+    //-----------------------------API3 : 접속한 그룹 정보 조회 & 출석 정보 포함-----------------------------
+    @Query(value = "SELECT * FROM attender.group_tb g where g.gid = :gid", nativeQuery = true)
+    group_tb getGroupInfo(Integer gid);
 
+    @Query(value = "SELECT * FROM attender.user_and_history_tb uh WHERE uh.guid = (SELECT gu.guid FROM attender.group_and_user_tb gu WHERE (gu.gid = :gid AND gu.uid = :uid))", nativeQuery = true)
+    user_and_history_tb getAttendanceState(Integer gid, Integer uid);
 
-    //API4 : 출석 코드 생성 : GROUP Table update
+    @Query(value = "SELECT * FROM attender.history_tb h where h.hid = :hid", nativeQuery = true)
+    history_tb getHistoryState(Integer hid);
+
+    //-----------------------------API4 : 출석 코드 생성-----------------------------
     @Modifying
-    @Query(value = "UPDATE `attendance_web_db`.`group` SET `attendance_code` = :invite_code WHERE (`gid` = :gid)", nativeQuery = true)
-    void putAttendanceCode(String invite_code, Integer gid);
+    @Query(value = "INSERT INTO attender.code_tb " +
+            "(attendance_code, accept_start_time, accept_end_time, create_date_time) " +
+            "VALUES (:attendanceCode, :acceptStartTime, :acceptEndTime, now())", nativeQuery = true)
+    void insertAttendanceCode(String attendanceCode, LocalDateTime acceptStartTime, LocalDateTime acceptEndTime);
 
     @Modifying
-    @Query(value = "UPDATE `attendance_web_db`.`code` SET `state` = 'd' WHERE (`gid` = :gid)", nativeQuery = true)
-    void updateCodeState(Integer gid);
+    @Query(value = "UPDATE attender.group_tb SET cid = (SELECT LAST_INSERT_ID()) WHERE gid = :gid", nativeQuery = true)
+    void putGroupCid(Integer gid);
 
-    @Modifying
-    @Query(value = "INSERT INTO `attendance_web_db`.`code` " +
-            "(gid, attendanceCode, acceptStartTime, acceptEndtime, state) " +
-            "VALUES (:gid, :attendance_code, :acceptStartTime, :acceptEndTime, 'a')", nativeQuery = true)
-    void insertCode(Integer gid, String attendance_code, LocalDateTime acceptStartTime, LocalDateTime acceptEndTime);
-
-
+    //-----------------------------API5 : 출석 코드 조회-----------------------------
     //API5 : 출석 코드 조회
-    @Query(value = "SELECT g.attendance_code FROM attendance_web_db.group g where g.gid = :gid", nativeQuery = true)
+    @Query(value = "SELECT c.attendance_code FROM attender.code_tb c WHERE c.cid = (SELECT g.cid FROM attender.group_tb g where g.gid = :gid)", nativeQuery = true)
     String getAttendanceCode(Integer gid);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     //API6 : 자신이 참여한 그룹 리스트 조회
@@ -64,9 +81,7 @@ public interface GroupRepository extends JpaRepository<group_tb, Integer> {
                     "WHERE gu.uid = :userId ", nativeQuery = true)
     List<Object[]> getJoinedGroupList(Integer userId);
 
-    //API7 : 접속한 그룹 정보 조회
-    @Query(value = "SELECT * FROM attendance_web_db.group g where g.gid = :gid", nativeQuery = true)
-    group_tb getGroupInfo(Integer gid);
+
 
 
 
