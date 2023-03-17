@@ -20,7 +20,6 @@ public class Controller {
     }
     //------------------------실행 테스트-----------------------
 
-
     //----------------------Project API------------------------
     //API1 : 사용자가 생성한 그룹 리스트 가져오기
     @GetMapping(value = "/api/user/{uid}/groups/created")
