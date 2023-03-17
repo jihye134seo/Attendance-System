@@ -20,11 +20,9 @@ public class code_tb {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer cid;
-    private Integer gid;
     private String attendance_code;
     private LocalDateTime accept_start_time;
     private LocalDateTime accept_end_time;
-    private Character availability;
     private LocalDateTime create_date_time;
 
     public Integer getCid() {
@@ -33,14 +31,6 @@ public class code_tb {
 
     public void setCid(Integer cid) {
         this.cid = cid;
-    }
-
-    public Integer getGid() {
-        return gid;
-    }
-
-    public void setGid(Integer gid) {
-        this.gid = gid;
     }
 
     public String getAttendance_code() {
@@ -65,14 +55,6 @@ public class code_tb {
 
     public void setAccept_end_time(LocalDateTime accept_end_time) {
         this.accept_end_time = accept_end_time;
-    }
-
-    public Character getAvailability() {
-        return availability;
-    }
-
-    public void setAvailability(Character availability) {
-        this.availability = availability;
     }
 
     public LocalDateTime getCreate_date_time() {

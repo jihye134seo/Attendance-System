@@ -7,19 +7,13 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Entity
-public class AttendanceCodeApi {
+
+public class PutAttendanceCodeRequest {
 
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer gid;
     private LocalDateTime acceptStartTime;
     private LocalDateTime acceptEndTime;
@@ -43,9 +37,6 @@ public class AttendanceCodeApi {
 
     public LocalDateTime getAcceptEndTime() {
         return acceptEndTime;
-    }
-    public void setAcceptEndTime(LocalDateTime acceptEndTime) {
-        this.acceptEndTime = acceptEndTime;
     }
 
 }

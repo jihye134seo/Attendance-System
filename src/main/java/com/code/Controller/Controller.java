@@ -28,17 +28,22 @@ public class Controller {
         return service.getGroupList(Integer.parseInt(uid));
     }
 
-    //API2 + API3 : 그룹 생성 & 초대코드 return
-    @ResponseBody
+    //API2 : 그룹 생성 & 초대코드 return
     @PostMapping(value = "/api/group")
-    public String createGroup(@RequestBody GroupApi groupApi) {
-        return service.createGroup(groupApi.getUid(), groupApi.getGroup_title(), groupApi.getGroup_detail());
+    public String createGroup(@RequestBody CreateGroupRequest createGroupRequest) {
+        return service.createGroup(createGroupRequest.getUid(), createGroupRequest.getGroup_title(), createGroupRequest.getGroup_detail());
     }
 
-    //API4 : 출석 코드 생성 : GROUP Table update
+    //API3 : 접속한 그룹 정보 조회 & 출석 정보 포함
+    @GetMapping(value = "/api/group/{gid}/{uid}")
+    public GroupInfoResponse getGroupInfo(@PathVariable String gid, @PathVariable String uid) {
+        return service.getGroupInfo(Integer.parseInt(gid), Integer.parseInt(uid));
+    }
+
+    //API4 : 출석 코드 생성
     @PutMapping(value = "/api/attendance")
-    public void putAttendanceCode(@RequestBody AttendanceCodeApi attendanceCodeApi) {
-        service.putAttendanceCode(attendanceCodeApi.getGid(), attendanceCodeApi.getAcceptStartTime(), attendanceCodeApi.getAcceptEndTime());
+    public void putAttendanceCode(@RequestBody PutAttendanceCodeRequest putAttendanceCodeRequest) {
+        service.putAttendanceCode(putAttendanceCodeRequest.getGid(), putAttendanceCodeRequest.getAcceptStartTime(), putAttendanceCodeRequest.getAcceptEndTime());
     }
 
     //API5 : 출석 코드 조회
@@ -54,11 +59,17 @@ public class Controller {
     }
 
 
-    //API7 : 접속한 그룹 정보 조회
-    @GetMapping(value = "/api/group/{gid}")
-    public group_tb getGroupInfo(@PathVariable String gid) {
-        return service.getGroupInfo(Integer.parseInt(gid));
-    }
+
+
+
+
+
+
+
+
+
+
+
 
     //API8 : 사용자의 출석 상태 Insert
     @PostMapping(value = "/api/user/attendance")

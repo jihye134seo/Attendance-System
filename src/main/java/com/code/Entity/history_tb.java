@@ -24,7 +24,7 @@ public class history_tb {
     private LocalDateTime enter_time;
     private LocalDateTime exit_time;
     private Character attendance_state;
-    private String attendance_code;
+    private Integer cid;
     private LocalDateTime create_date_time;
 
 
@@ -68,12 +68,12 @@ public class history_tb {
         this.attendance_state = attendance_state;
     }
 
-    public String getAttendance_code() {
-        return attendance_code;
+    public Integer getCid() {
+        return cid;
     }
 
-    public void setAttendance_code(String attendance_code) {
-        this.attendance_code = attendance_code;
+    public void setCid(Integer cid) {
+        this.cid = cid;
     }
 
     public LocalDateTime getCreate_date_time() {

@@ -25,8 +25,10 @@ public class group_tb {
     private Integer leader_uid;
     private String invite_code;
     private Character availability;
-    private String attendance_code;
+    private Integer cid;
     private LocalDateTime create_date_time;
+
+
 
 
     public Integer getGid() {
@@ -77,12 +79,13 @@ public class group_tb {
         this.availability = availability;
     }
 
-    public String getAttendance_code() {
-        return attendance_code;
+
+    public Integer getCid() {
+        return cid;
     }
 
-    public void setAttendance_code(String attendance_code) {
-        this.attendance_code = attendance_code;
+    public void setCid(Integer cid) {
+        this.cid = cid;
     }
 
     public LocalDateTime getCreate_date_time() {
