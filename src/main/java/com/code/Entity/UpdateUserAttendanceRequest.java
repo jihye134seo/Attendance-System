@@ -2,12 +2,16 @@ package com.code.Entity;
 
 import java.time.LocalDateTime;
 
-public class AttendanceUpdateApi {
+public class UpdateUserAttendanceRequest {
 
 
     private String guid;
     private LocalDateTime exit_time;
 
+    public UpdateUserAttendanceRequest(String guid, LocalDateTime exit_time) {
+        this.guid = guid;
+        this.exit_time = exit_time;
+    }
 
     public String getGuid() {
         return guid;

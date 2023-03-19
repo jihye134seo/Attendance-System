@@ -89,55 +89,102 @@ public class Service {
         return groupRepository.getAttendanceCode(gid);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     //API6 : 자신이 참여한 그룹 리스트 조회
-    public List<API6Response> getJoinedGroupList(Integer userId) {
+    public List<GetJoinedGroupResponse> getJoinedGroupList(Integer uid) {
 
-        var objLists = groupRepository.getJoinedGroupList(userId);
+        List<group_and_user_tb> joinedGroupList = groupRepository.getJoinedGroupList(uid);
 
-        ArrayList<API6Response> result = new ArrayList<API6Response>();
+        ArrayList<GetJoinedGroupResponse> result = new ArrayList<GetJoinedGroupResponse>();
 
-        for(int i=0; i < objLists.size(); i++){
-            var list = objLists.get(i);
-            result.add(new API6Response(
-                    (Integer)list[0], (Integer)list[1], (String)list[2],
-                    (String)list[3], (String)list[4], list[5].toString(),
-                    (Integer)list[6], (Integer)list[7], (String)list[8]
+        for(int i=0; i < joinedGroupList.size(); i++){
+            group_and_user_tb temp = joinedGroupList.get(i);
+            result.add(new GetJoinedGroupResponse(
+                    temp.getGuid(),
+                    groupRepository.getJoinedGroupInfo(temp.getGid())
             ));
         }
 
         return result;
     }
 
-
-
-
-    //API8 : 사용자의 출석 상태 Insert
-    public void insertUserAttendance(String guid, LocalDateTime enterTime, String attendanceCode) {
-        groupRepository.insertUserAttendance(guid, enterTime, attendanceCode);
-        groupRepository.updateHid(guid);
+    //API7 : 메인페이지 - 전체 회원수, 그룹수, 오늘 출석한 사람 수
+    public MainPageResponse getMainPageInfo() {
+        return new MainPageResponse(
+                groupRepository.getAllMemberConut(),
+                groupRepository.getAllGroupCount(),
+                groupRepository.getTodayAttendCount()
+        );
     }
 
+    //API8 : 사용자의 출석 상태 Insert
+    public String insertUserAttendance(String guid, LocalDateTime enterTime, String attendanceCode) {
+
+        //0. cid와 일치하는지 유효성 검사 코드를 작성한다.
+
+        Integer groupCid = groupRepository.getGroupCurrentCid(guid);
+        Integer foundCid = groupRepository.getFoundCid(attendanceCode);
+
+        if(groupCid.compareTo(foundCid) == 0) { //올바른 코드가 입력되었다면
+
+            //1. history_tb에 출석정보 추가
+            groupRepository.insertUserAttendanceToHistory(guid, enterTime, groupCid);
+
+            //2. user_and_history_tb에 출석 정보 추가
+            groupRepository.insertUserAttendanceToUAH(guid);
+
+
+            return "OK";
+        }
+        else{
+            return "FAIL"; // 올바르지 않은 코드가 입력되었다면.
+        }
+
+    }
+
+    //API9 : 사용자의 출석 상태 Update
     public void updateUserAttendance(String guid, LocalDateTime exitTime) {
         groupRepository.updateUserAttendance(guid, exitTime);
     }
 
-    public void insertGroupUser(Integer uid, String userCode) {
-        groupRepository.insertGroupUser(uid, userCode);
+    //API10 : 그룹 참가
+    public String insertGroupUser(Integer uid, String userCode) {
+
+        //0. 사용자가 입력한 초대 코드가 유효한 코드인지 확인한다.
+        //1. 사용자가 입력한 초대 코드가 유효하지 않다면 FAIL
+        Integer foundGid = groupRepository.getGroupInviteCode(userCode);
+
+        if(foundGid != null) { //올바른 코드가 입력되었다면
+            //2. 사용자가 입력한 초대 코드가 유효하다면 GROUP USER에 INSERT
+            groupRepository.insertGroupUser(uid, foundGid);
+
+            return "OK";
+        }
+        else{
+            //1. 사용자가 입력한 초대 코드가 유효하지 않다면 FAIL
+            return "FAIL"; // 올바르지 않은 코드가 입력되었다면.
+        }
     }
+
+
+
+    //API11 : 그룹의 회원수
+    public Integer getGroupUserCount(Integer gid) {
+        return groupRepository.getGroupUserCount(gid);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     //----------------------Project API------------------------
 }

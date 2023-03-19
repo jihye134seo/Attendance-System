@@ -51,45 +51,53 @@ public class Controller {
         return service.getAttendanceCode(Integer.parseInt(gid));
     }
 
+
+
+
+    //~~~~~~~~~~~~수정 완료 + 점검 필요~~~~~~~~~~~~
+
+
     //API6 : 자신이 참여한 그룹 리스트 조회
     @GetMapping(value = "/api/user/{uid}/groups/joined")
-    public List<API6Response> getJoinedGroupList(@PathVariable String uid) {
+    public List<GetJoinedGroupResponse> getJoinedGroupList(@PathVariable String uid) {
         return service.getJoinedGroupList(Integer.parseInt(uid));
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
+    //API7 : 메인페이지 - 전체 회원수, 그룹수, 오늘 출석한 사람 수
+    @GetMapping(value = "/api/main")
+    public MainPageResponse getMainPageInfo() {
+        return service.getMainPageInfo();
+    }
 
     //API8 : 사용자의 출석 상태 Insert
     @PostMapping(value = "/api/user/attendance")
-    public void insertUserAttendance(@RequestBody AttendanceInsertApi attendanceInsertApi) {
-        service.insertUserAttendance(attendanceInsertApi.getGuid(), attendanceInsertApi.getEnter_time(), attendanceInsertApi.getAttendance_code());
+    public String insertUserAttendance(@RequestBody InsertUserAttendanceRequest insertUserAttendanceRequest) {
+        return service.insertUserAttendance(insertUserAttendanceRequest.getGuid(), insertUserAttendanceRequest.getEnter_time(), insertUserAttendanceRequest.getAttendance_code());
     }
-
 
     //API9 : 사용자의 출석 상태 Update
     @PatchMapping(value = "/api/user/attendance")
-    public void updateUserAttendance(@RequestBody AttendanceUpdateApi attendanceUpdateApi) {
-        service.updateUserAttendance(attendanceUpdateApi.getGuid(), attendanceUpdateApi.getExit_time());
+    public void updateUserAttendance(@RequestBody UpdateUserAttendanceRequest updateUserAttendanceRequest) {
+        service.updateUserAttendance(updateUserAttendanceRequest.getGuid(), updateUserAttendanceRequest.getExit_time());
     }
-
 
     //API10 : 그룹 참가
-    @ResponseBody
     @PostMapping(value = "/api/group/join")
-    public void insertGroupUser(@RequestBody InsertUserGroupApi insertUserGroupApi) {
-        service.insertGroupUser(insertUserGroupApi.getUid(), insertUserGroupApi.getInvite_code());
+    public String insertGroupUser(@RequestBody InsertGroupUserRequest insertGroupUserRequest) {
+        return service.insertGroupUser(insertGroupUserRequest.getUid(), insertGroupUserRequest.getInvite_code());
     }
+
+    //API11 : 그룹의 회원수
+    @GetMapping(value = "/api/group/{gid}/count")
+    public Integer getGroupUserCount(@PathVariable String gid) {
+        return service.getGroupUserCount(Integer.parseInt(gid));
+    }
+
+
+
+
+
+
 
 
 

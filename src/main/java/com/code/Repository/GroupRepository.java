@@ -1,5 +1,6 @@
 package com.code.Repository;
 
+import com.code.Entity.group_and_user_tb;
 import com.code.Entity.group_tb;
 import com.code.Entity.history_tb;
 import com.code.Entity.user_and_history_tb;
@@ -55,58 +56,60 @@ public interface GroupRepository extends JpaRepository<group_tb, Integer> {
     void putGroupCid(Integer gid);
 
     //-----------------------------API5 : 출석 코드 조회-----------------------------
-    //API5 : 출석 코드 조회
     @Query(value = "SELECT c.attendance_code FROM attender.code_tb c WHERE c.cid = (SELECT g.cid FROM attender.group_tb g where g.gid = :gid)", nativeQuery = true)
     String getAttendanceCode(Integer gid);
 
+    //-----------------------------API6 : 자신이 참여한 그룹 리스트 조회-----------------------------
+    @Query(value = "SELECT * FROM attender.group_and_user_tb g where uid = :uid", nativeQuery = true)
+    List<group_and_user_tb> getJoinedGroupList(Integer uid);
+    @Query(value = "SELECT * FROM attender.group_tb g where g.gid = :gid", nativeQuery = true)
+    group_tb getJoinedGroupInfo(Integer gid);
 
+    //--------------------API7 : 메인페이지 - 전체 회원수, 그룹수, 오늘 출석한 사람 수--------------------
+    @Query(value = "SELECT count(u.uid) FROM attender.user_tb u GROUP BY u.uid", nativeQuery = true)
+    Integer getAllMemberConut();
+    @Query(value = "SELECT count(g.gid) FROM attender.group_tb g GROUP BY g.gid", nativeQuery = true)
+    Integer getAllGroupCount();
+    @Query(value = "SELECT count(uh.uhid) FROM attender.user_and_history_tb uh GROUP BY uh.uhid", nativeQuery = true)
+    Integer getTodayAttendCount();
 
+    //------------------------------API8 : 사용자의 출석 상태 Insert------------------------------
+    @Query(value = "SELECT g.cid FROM attender.group_tb g WHERE g.gid = (SELECT gu.gid FROM attender.group_and_user_tb gu WHERE gu.guid = :guid)", nativeQuery = true)
+    Integer getGroupCurrentCid(String guid);
 
+    @Query(value = "SELECT c.cid FROM attender.code_tb c WHERE c.attendance_code = :attendanceCode", nativeQuery = true)
+    Integer getFoundCid(String attendanceCode);
 
-
-
-
-
-
-
-
-
-
-
-    //API6 : 자신이 참여한 그룹 리스트 조회
-    @Query(value = "SELECT gu.guid, g.*" +
-                    "FROM attendance_web_db.group g " +
-                    "INNER JOIN attendance_web_db.group_user gu " +
-                    "ON g.gid = gu.gid " +
-                    "WHERE gu.uid = :userId ", nativeQuery = true)
-    List<Object[]> getJoinedGroupList(Integer userId);
-
-
-
-
-
-    //API8 : 사용자의 출석 상태 Insert
     @Modifying
-    @Query(value = "INSERT INTO attendance_web_db.history " +
-            "(`guid`, `enter_time`, `generate_time`, `attendance_code`) " +
-            "VALUES (:guid, :enterTime, now(), :attendanceCode)", nativeQuery = true)
-    void insertUserAttendance(String guid, LocalDateTime enterTime, String attendanceCode);
-    @Modifying
-    @Query(value = "UPDATE `attendance_web_db`.`group_user` SET `hid` = (SELECT LAST_INSERT_ID()) WHERE (`guid` = :guid)", nativeQuery = true)
-    void updateHid(String guid);
+    @Query(value = "INSERT INTO attender.history_tb " +
+            "(guid, enter_time, cid, create_date_time) " +
+            "VALUES (:guid, :enterTime, :groupCid, now())", nativeQuery = true)
+    void insertUserAttendanceToHistory(String guid, LocalDateTime enterTime, Integer groupCid);
 
-    //API9 : 사용자의 출석 상태 Update
     @Modifying
-    @Query(value = "UPDATE `attendance_web_db`.`history` SET `exit_time` = :exitTime, `attendance_state` = 'P' WHERE `hid` = (select hid from attendance_web_db.group_user where guid = :guid )", nativeQuery = true)
+    @Query(value = "INSERT INTO attender.user_and_history_tb " +
+            "(hid, guid) " +
+            "VALUES (((SELECT LAST_INSERT_ID()), :guid)", nativeQuery = true)
+    void insertUserAttendanceToUAH(String guid);
+
+    //------------------------------API9 : 사용자의 출석 상태 Update------------------------------
+    @Modifying
+    @Query(value = "UPDATE attender.history_tb SET exit_time = :exitTime, attendance_state = 'Y' WHERE hid = (SELECT hid FROM attender.user_and_history_tb WHERE guid = :guid )", nativeQuery = true)
     void updateUserAttendance(String guid, LocalDateTime exitTime);
 
 
+    //------------------------------API10 : 그룹 참가------------------------------
 
-    //API10 : 그룹 참가
+    @Query(value = "SELECT g.gid FROM attender.group_tb g WHERE g.invite_code = :userCode", nativeQuery = true)
+    Integer getGroupInviteCode(String userCode);
     @Modifying
-    @Query(value = "INSERT INTO attendance_web_db.group_user " +
-            "(`uid`, `gid`, `present_state`) " +
-            "VALUES (:uid, (select gid from attendance_web_db.group g where g.invite_code = :userCode), 'Y')", nativeQuery = true)
-    void insertGroupUser(Integer uid, String userCode);
+    @Query(value = "INSERT INTO attender.group_and_user_tb (uid, gid) VALUES (:uid, :gid)", nativeQuery = true)
+    void insertGroupUser(Integer uid, Integer gid);
+
+
+    //------------------------------API11 : 그룹의 회원수-----------------------------
+    @Query(value = "SELECT count(g.gid) FROM attender.group_tb g GROUP BY g.gid WHERE g.gid = :gid", nativeQuery = true)
+    Integer getGroupUserCount(Integer gid);
+
 
 }
