@@ -1,6 +1,9 @@
 package com.code.Service;
 
 import com.code.Entity.*;
+import com.code.Entity.requestandresponse.GetJoinedGroupResponse;
+import com.code.Entity.requestandresponse.GroupInfoResponse;
+import com.code.Entity.requestandresponse.MainPageResponse;
 import com.code.Repository.GroupRepository;
 import com.code.Repository.UserRepository;
 import lombok.AllArgsConstructor;

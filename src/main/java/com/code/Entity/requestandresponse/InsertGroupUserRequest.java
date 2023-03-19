@@ -1,4 +1,4 @@
-package com.code.Entity;
+package com.code.Entity.requestandresponse;
 
 public class InsertGroupUserRequest {
 

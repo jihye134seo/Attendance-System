@@ -1,4 +1,6 @@
-package com.code.Entity;
+package com.code.Entity.requestandresponse;
+
+import com.code.Entity.group_tb;
 
 public class GetJoinedGroupResponse {
 
