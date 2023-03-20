@@ -52,6 +52,7 @@ public interface GroupRepository extends JpaRepository<group_tb, Integer> {
     void insertAttendanceCode(String attendanceCode, LocalDateTime acceptStartTime, LocalDateTime acceptEndTime);
 
     @Modifying
+    @Transactional
     @Query(value = "UPDATE attender.group_tb SET cid = (SELECT LAST_INSERT_ID()) WHERE gid = :gid", nativeQuery = true)
     void putGroupCid(Integer gid);
 
@@ -60,17 +61,17 @@ public interface GroupRepository extends JpaRepository<group_tb, Integer> {
     String getAttendanceCode(Integer gid);
 
     //-----------------------------API6 : 자신이 참여한 그룹 리스트 조회-----------------------------
-    @Query(value = "SELECT * FROM attender.group_and_user_tb g where uid = :uid", nativeQuery = true)
-    List<group_and_user_tb> getJoinedGroupList(Integer uid);
+    @Query(value = "SELECT * FROM attender.group_and_user_tb g where g.uid = :uid", nativeQuery = true)
+    List<Object[]> getJoinedGroupList(@Param("uid") Integer uid);
     @Query(value = "SELECT * FROM attender.group_tb g where g.gid = :gid", nativeQuery = true)
     group_tb getJoinedGroupInfo(Integer gid);
 
     //--------------------API7 : 메인페이지 - 전체 회원수, 그룹수, 오늘 출석한 사람 수--------------------
-    @Query(value = "SELECT count(u.uid) FROM attender.user_tb u GROUP BY u.uid", nativeQuery = true)
+    @Query(value = "SELECT count(u.uid) FROM attender.user_tb u", nativeQuery = true)
     Integer getAllMemberConut();
-    @Query(value = "SELECT count(g.gid) FROM attender.group_tb g GROUP BY g.gid", nativeQuery = true)
+    @Query(value = "SELECT count(g.gid) FROM attender.group_tb g", nativeQuery = true)
     Integer getAllGroupCount();
-    @Query(value = "SELECT count(uh.uhid) FROM attender.user_and_history_tb uh GROUP BY uh.uhid", nativeQuery = true)
+    @Query(value = "SELECT count(uh.uhid) FROM attender.user_and_history_tb uh", nativeQuery = true)
     Integer getTodayAttendCount();
 
     //------------------------------API8 : 사용자의 출석 상태 Insert------------------------------
@@ -89,11 +90,12 @@ public interface GroupRepository extends JpaRepository<group_tb, Integer> {
     @Modifying
     @Query(value = "INSERT INTO attender.user_and_history_tb " +
             "(hid, guid) " +
-            "VALUES (((SELECT LAST_INSERT_ID()), :guid)", nativeQuery = true)
+            "VALUES ((SELECT LAST_INSERT_ID()), :guid)", nativeQuery = true)
     void insertUserAttendanceToUAH(String guid);
 
     //------------------------------API9 : 사용자의 출석 상태 Update------------------------------
     @Modifying
+    @Transactional
     @Query(value = "UPDATE attender.history_tb SET exit_time = :exitTime, attendance_state = 'Y' WHERE hid = (SELECT hid FROM attender.user_and_history_tb WHERE guid = :guid )", nativeQuery = true)
     void updateUserAttendance(String guid, LocalDateTime exitTime);
 
@@ -102,14 +104,40 @@ public interface GroupRepository extends JpaRepository<group_tb, Integer> {
 
     @Query(value = "SELECT g.gid FROM attender.group_tb g WHERE g.invite_code = :userCode", nativeQuery = true)
     Integer getGroupInviteCode(String userCode);
+
+    @Query(value = "SELECT gu.guid FROM attender.group_and_user_tb gu WHERE gu.gid = :gid and gu.uid = :uid", nativeQuery = true)
+    Integer getIsUserInGroup(Integer uid, Integer gid);
+
     @Modifying
     @Query(value = "INSERT INTO attender.group_and_user_tb (uid, gid) VALUES (:uid, :gid)", nativeQuery = true)
     void insertGroupUser(Integer uid, Integer gid);
 
 
     //------------------------------API11 : 그룹의 회원수-----------------------------
-    @Query(value = "SELECT count(g.gid) FROM attender.group_tb g GROUP BY g.gid WHERE g.gid = :gid", nativeQuery = true)
+    @Query(value = "SELECT count(g.gid) FROM attender.group_and_user_tb g GROUP BY g.gid HAVING g.gid = :gid", nativeQuery = true)
     Integer getGroupUserCount(Integer gid);
+
+
+
+
+
+
+
+
+
+
+
+    @Transactional
+    @Query(value = "COMMIT;", nativeQuery = true)
+
+    void commit();
+    @Transactional
+    @Query(value = "start transaction;", nativeQuery = true)
+
+    void transactionStart();
+
+
+
 
 
 }
