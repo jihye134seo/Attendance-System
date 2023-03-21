@@ -95,15 +95,15 @@ public class Service {
     //API6 : 자신이 참여한 그룹 리스트 조회
     public List<GetJoinedGroupResponse> getJoinedGroupList(Integer uid) {
 
-        List<group_and_user_tb> joinedGroupList = groupRepository.getJoinedGroupList(uid);
+        List<Object[]> joinedGroupList = groupRepository.getJoinedGroupList(uid);
 
         ArrayList<GetJoinedGroupResponse> result = new ArrayList<GetJoinedGroupResponse>();
 
         for(int i=0; i < joinedGroupList.size(); i++){
-            group_and_user_tb temp = joinedGroupList.get(i);
+            Object[] temp = joinedGroupList.get(i);
             result.add(new GetJoinedGroupResponse(
-                    temp.getGuid(),
-                    groupRepository.getJoinedGroupInfo(temp.getGid())
+                    (Integer)temp[0],
+                    groupRepository.getJoinedGroupInfo((Integer)temp[2])
             ));
         }
 
@@ -129,12 +129,15 @@ public class Service {
 
         if(groupCid.compareTo(foundCid) == 0) { //올바른 코드가 입력되었다면
 
+//            groupRepository.transactionStart();
+
             //1. history_tb에 출석정보 추가
             groupRepository.insertUserAttendanceToHistory(guid, enterTime, groupCid);
 
             //2. user_and_history_tb에 출석 정보 추가
             groupRepository.insertUserAttendanceToUAH(guid);
 
+//            groupRepository.commit();
 
             return "OK";
         }
@@ -157,10 +160,17 @@ public class Service {
         Integer foundGid = groupRepository.getGroupInviteCode(userCode);
 
         if(foundGid != null) { //올바른 코드가 입력되었다면
-            //2. 사용자가 입력한 초대 코드가 유효하다면 GROUP USER에 INSERT
-            groupRepository.insertGroupUser(uid, foundGid);
 
-            return "OK";
+            //1.5 이미 사용자가 그룹에 속한 사람이라면
+            if(groupRepository.getIsUserInGroup(uid, foundGid) != null){
+                return "Already Exist";
+            }
+            else{
+                //2. 사용자가 입력한 초대 코드가 유효하다면 GROUP USER에 INSERT
+                groupRepository.insertGroupUser(uid, foundGid);
+
+                return "OK";
+            }
         }
         else{
             //1. 사용자가 입력한 초대 코드가 유효하지 않다면 FAIL
