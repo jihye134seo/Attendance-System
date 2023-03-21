@@ -177,16 +177,21 @@ public class Service {
 
 
 
+    ///////////////////////////////////////////////////////////////
 
+    //API12 : 로그인
+    public String login(String email, String password) {
 
+        if(groupRepository.login(email, Integer.parseInt(password)) != null){
+            return "success";
+        }
+        else{
+            return "fail";
+        }
 
+    }
 
-
-
-
-
-
-
+    ///////////////////////////////////////////////////////////////
 
 
     //----------------------Project API------------------------
