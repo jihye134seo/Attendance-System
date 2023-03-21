@@ -5,6 +5,7 @@ import com.code.Entity.requestandresponse.*;
 import com.code.Service.Service;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import com.code.JwtToken.MemberLoginRequestDto;
 
 import java.util.List;
 
@@ -95,7 +96,11 @@ public class Controller {
     }
 
 
-
+    //API12 : 로그인
+    @GetMapping(value = "/api/login")
+    public String templogin(@RequestBody MemberLoginRequestDto memberLoginRequestDto) {
+        return service.templogin(memberLoginRequestDto.getMemberId(), memberLoginRequestDto.getPassword());
+    }
 
 
 

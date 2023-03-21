@@ -185,18 +185,15 @@ public class Service {
         return groupRepository.getGroupUserCount(gid);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
+    //API12 : 로그인
+    public String templogin(String memberId, String password) {
+        if(groupRepository.tempLogin(memberId, password) != null){
+            return "success";
+        }
+        else{
+            return "fail";
+        }
+    }
 
 
     //----------------------Project API------------------------
