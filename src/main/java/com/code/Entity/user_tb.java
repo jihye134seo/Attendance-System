@@ -41,30 +41,6 @@ public class user_tb implements UserDetails {
 
 
 
-    public Integer getUid() {
-        return uid;
-    }
-
-    public void setUid(Integer uid) {
-        this.uid = uid;
-    }
-
-    public String getEmail_address() {
-        return email_address;
-    }
-    public void setEmail_address(String email_address) {
-        this.email_address = email_address;
-    }
-    public Character getRole() {
-        return role;
-    }
-
-    public void setRole(Character role) {
-        this.role = role;
-    }
-
-
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.roles.stream()
