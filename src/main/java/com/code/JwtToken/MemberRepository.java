@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<user_tb, Long> {
-    Optional<user_tb> findByEmailAddress(String emailAddress);
+    Optional<user_tb> findByEmailAddress(String email_address);
 }
