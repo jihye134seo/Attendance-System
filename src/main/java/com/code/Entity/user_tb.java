@@ -40,7 +40,6 @@ public class user_tb implements UserDetails {
     private List<String> roles = new ArrayList<>();
 
 
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.roles.stream()

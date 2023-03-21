@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/members")
+@RequestMapping("/user")
 public class MemberController {
     private final MemberService memberService;
 
@@ -21,4 +21,10 @@ public class MemberController {
         TokenInfo tokenInfo = memberService.login(memberId, password);
         return tokenInfo;
     }
+
+    @PostMapping("/test")
+    public String test() {
+        return "success";
+    }
+
 }
