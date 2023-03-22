@@ -118,11 +118,6 @@ public interface GroupRepository extends JpaRepository<group_tb, Integer> {
     Integer getGroupUserCount(Integer gid);
 
 
-    //------------------------------API12 : 로그인-----------------------------
-    @Query(value = "SELECT u.uid FROM attender.user_tb u WHERE u.email_address = :memberId and u.password = :password", nativeQuery = true)
-    Integer tempLogin(String memberId, String password);
-
-
 
 
 

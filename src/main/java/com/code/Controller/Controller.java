@@ -96,25 +96,12 @@ public class Controller {
     }
 
 
-    //API12 : 로그인
-    @GetMapping(value = "/api/login")
-    public String templogin(@RequestBody MemberLoginRequestDto memberLoginRequestDto) {
-        return service.templogin(memberLoginRequestDto.getMemberId(), memberLoginRequestDto.getPassword());
-    }
-
 
 
 
 
 
     //----------------------Project API------------------------
-
-
-
-
-
-
-
 
 
 
