@@ -95,6 +95,16 @@ public class Controller {
     }
 
 
+    ///////////////////////////////////////////////////////////////
+
+
+    //API12 : 로그인
+    @GetMapping(value = "/api/login")
+    public String login(@RequestBody LoginRequest loginRequest) {
+        return service.login(loginRequest.getEmail(), loginRequest.getPassword());
+    }
+
+    ///////////////////////////////////////////////////////////////
 
 
 

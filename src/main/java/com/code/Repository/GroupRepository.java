@@ -120,6 +120,16 @@ public interface GroupRepository extends JpaRepository<group_tb, Integer> {
 
 
 
+    ///////////////////////////////////////////////////////////////////////////////////
+
+    //------------------------------API12 : 로그인-----------------------------
+
+    @Query(value = "SELECT u.uid FROM attender.user_tb u WHERE u.email_address = :email and u.password = :password", nativeQuery = true)
+    Integer login(String email, Integer password);
+
+    ///////////////////////////////////////////////////////////////////////////////////
+
+
 
 
 
