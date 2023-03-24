@@ -39,7 +39,7 @@ public interface GroupRepository extends JpaRepository<group_tb, Integer> {
     group_tb getGroupInfo(Integer gid);
 
     @Query(value = "SELECT * FROM attender.user_and_history_tb uh WHERE uh.guid = (SELECT gu.guid FROM attender.group_and_user_tb gu WHERE (gu.gid = :gid AND gu.uid = :uid))", nativeQuery = true)
-    user_and_history_tb getAttendanceState(Integer gid, Integer uid);
+    Object[] getAttendanceState(Integer gid, Integer uid);
 
     @Query(value = "SELECT * FROM attender.history_tb h where h.hid = :hid", nativeQuery = true)
     history_tb getHistoryState(Integer hid);

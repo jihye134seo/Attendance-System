@@ -13,6 +13,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 //import org.apache.tomcat.util.json.ParseException;
 //import org.h2.util.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 
 import java.util.ArrayList;
@@ -60,13 +61,15 @@ public class Service {
     public GroupInfoResponse getGroupInfo(Integer gid, Integer uid) {
 
         group_tb groupInfo = groupRepository.getGroupInfo(gid);
-        user_and_history_tb attendanceState = groupRepository.getAttendanceState(gid, uid);
+        var attendanceState = groupRepository.getAttendanceState(gid, uid);
 
         if(attendanceState == null){
             return new GroupInfoResponse(groupInfo, "NO");
         }
         else{
-            history_tb userHistory = groupRepository.getHistoryState(attendanceState.getHid());
+
+            Object[] temp = (Object[])attendanceState[0];
+            history_tb userHistory = groupRepository.getHistoryState((Integer)temp[1]);
 
             if(userHistory.getExit_time() == null){
                 return new GroupInfoResponse(groupInfo, "Enter");
