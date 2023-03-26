@@ -63,7 +63,7 @@ public class Service {
         group_tb groupInfo = groupRepository.getGroupInfo(gid);
         var attendanceState = groupRepository.getAttendanceState(gid, uid);
 
-        if(attendanceState == null){
+        if(attendanceState.length == 0){
             return new GroupInfoResponse(groupInfo, "NO");
         }
         else{
