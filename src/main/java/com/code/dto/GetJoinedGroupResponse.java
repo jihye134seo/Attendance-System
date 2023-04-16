@@ -1,4 +1,4 @@
-package com.code.Entity.requestandresponse;
+package com.code.dto;
 
 import com.code.Entity.group_tb;
 

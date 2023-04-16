@@ -1,11 +1,12 @@
 package com.code.Service;
 
 import com.code.Entity.*;
-import com.code.Entity.requestandresponse.GetJoinedGroupResponse;
-import com.code.Entity.requestandresponse.GroupInfoResponse;
-import com.code.Entity.requestandresponse.MainPageResponse;
+import com.code.dto.GetJoinedGroupResponse;
+import com.code.dto.GroupInfoResponse;
+import com.code.dto.MainPageResponse;
 import com.code.Repository.GroupRepository;
 import com.code.Repository.UserRepository;
+import com.code.dto.SignUpRequest;
 import lombok.AllArgsConstructor;
 
 import org.apache.commons.lang3.RandomStringUtils;
@@ -13,7 +14,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 //import org.apache.tomcat.util.json.ParseException;
 //import org.h2.util.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ import java.util.UUID;
 
 @AllArgsConstructor
 @org.springframework.stereotype.Service
-public class Service {
+public class AttenderService {
 
     private UserRepository userRepository;
     private GroupRepository groupRepository;
@@ -190,7 +190,52 @@ public class Service {
 
 
 
-    ///////////////////////////////////////////////////////////////
+
+
+
+
+    /////////////////////////////////////////////////////////////////
+    //////////////////      Authentication      /////////////////////
+    /////////////////////////////////////////////////////////////////
+
+    // 1. 회원가입
+    public String signUp(SignUpRequest signUpRequest) {
+
+        try{
+            userRepository.save(user_tb.builder()
+                    .password(signUpRequest.getPassword())
+                    .real_name(signUpRequest.getReal_name())
+                    .email_address(signUpRequest.getEmail())
+                    .nick_name(signUpRequest.getNick_name())
+                    .role('U')
+                    .create_date_time(LocalDateTime.now())
+                    .build());
+
+
+            return "200 OK";
+
+        }
+        catch(Exception e){
+            System.out.println(e.getMessage());
+            throw new RuntimeException();
+        }
+
+    }
+
+
+
+
+    // 2. 로그인
+
+
+
+    // 3. 로그아웃
+
+
+
+
+
+
 
     //API12 : 로그인
     public String login(String email, String password) {
@@ -203,6 +248,8 @@ public class Service {
         }
 
     }
+
+
 
     ///////////////////////////////////////////////////////////////
 
