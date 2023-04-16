@@ -3,6 +3,7 @@ package com.code.Controller;
 import com.code.Entity.*;
 import com.code.dto.*;
 import com.code.Service.AttenderService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.BindingResult;
@@ -104,22 +105,27 @@ public class Controller {
 
 
     // 2. 로그인
-
+    @PostMapping(value = "/api/user/signin")
+    public String signIn(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+        return attenderService.signIn(loginRequest.getEmail(), loginRequest.getPassword(), response);
+    }
 
 
     // 3. 로그아웃
-
-
-
-
-
-
-
-    //API12 : 로그인
-    @GetMapping(value = "/api/login")
-    public String login(@RequestBody LoginRequest loginRequest) {
-        return attenderService.login(loginRequest.getEmail(), loginRequest.getPassword());
+    @PostMapping("/api/user/signout")
+    public String signOut(HttpServletResponse response, HttpServletRequest request) {
+        return attenderService.signOut(response, request);
     }
+
+
+    //4. 로그인 체크
+    @GetMapping("/api/user/check")
+    public String test(HttpServletRequest request) {
+        return attenderService.test(request);
+    }
+
+
+
 
     ///////////////////////////////////////////////////////////////
 

@@ -4,14 +4,14 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Getter
+@Builder
 //Group Table과 Mapping 됨
 public class group_and_user_tb {
 
@@ -21,28 +21,4 @@ public class group_and_user_tb {
     private Integer uid;
     private Integer gid;
 
-
-    public Integer getGuid() {
-        return guid;
-    }
-
-    public void setGuid(Integer guid) {
-        this.guid = guid;
-    }
-
-    public Integer getUid() {
-        return uid;
-    }
-
-    public void setUid(Integer uid) {
-        this.uid = uid;
-    }
-
-    public Integer getGid() {
-        return gid;
-    }
-
-    public void setGid(Integer gid) {
-        this.gid = gid;
-    }
 }

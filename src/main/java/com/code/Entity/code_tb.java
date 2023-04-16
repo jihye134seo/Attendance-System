@@ -4,9 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -14,6 +12,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Getter
+@Builder
 //Group Table과 Mapping 됨
 public class code_tb {
 
@@ -25,43 +25,4 @@ public class code_tb {
     private LocalDateTime accept_end_time;
     private LocalDateTime create_date_time;
 
-    public Integer getCid() {
-        return cid;
-    }
-
-    public void setCid(Integer cid) {
-        this.cid = cid;
-    }
-
-    public String getAttendance_code() {
-        return attendance_code;
-    }
-
-    public void setAttendance_code(String attendance_code) {
-        this.attendance_code = attendance_code;
-    }
-
-    public LocalDateTime getAccept_start_time() {
-        return accept_start_time;
-    }
-
-    public void setAccept_start_time(LocalDateTime accept_start_time) {
-        this.accept_start_time = accept_start_time;
-    }
-
-    public LocalDateTime getAccept_end_time() {
-        return accept_end_time;
-    }
-
-    public void setAccept_end_time(LocalDateTime accept_end_time) {
-        this.accept_end_time = accept_end_time;
-    }
-
-    public LocalDateTime getCreate_date_time() {
-        return create_date_time;
-    }
-
-    public void setCreate_date_time(LocalDateTime create_date_time) {
-        this.create_date_time = create_date_time;
-    }
 }

@@ -7,9 +7,13 @@ import com.code.dto.MainPageResponse;
 import com.code.Repository.GroupRepository;
 import com.code.Repository.UserRepository;
 import com.code.dto.SignUpRequest;
+import com.code.sessionAuthentication.SesseionManager;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.context.annotation.Bean;
 //import org.apache.tomcat.util.json.JSONParser;
 //import org.apache.tomcat.util.json.ParseException;
 //import org.h2.util.json.JSONObject;
@@ -18,6 +22,7 @@ import java.time.LocalDateTime;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -225,30 +230,60 @@ public class AttenderService {
 
 
 
+    SesseionManager sessionManager;
+
     // 2. 로그인
+    public String signIn(String email, String password, HttpServletResponse response) {
+
+        var temp = userRepository.checkSignInValidation(email, password);
 
 
+        try{
+            if(temp != null){
+                sessionManager.createSession(userRepository.findById(temp), response);
+                return "200 OK";
 
-    // 3. 로그아웃
-
-
-
-
-
-
-
-    //API12 : 로그인
-    public String login(String email, String password) {
-
-        if(groupRepository.login(email, Integer.parseInt(password)) != null){
-            return "success";
+            }
+            else{
+                return "Not a Member";
+            }
         }
-        else{
-            return "fail";
+        catch(Exception e){
+            System.out.println(e.getMessage());
+            throw new RuntimeException();
         }
+
+
 
     }
 
+
+    // 3. 로그아웃
+    public String signOut(HttpServletResponse response, HttpServletRequest request) {
+
+        try{
+            sessionManager.expire(request);
+            return "200 OK";
+        }
+        catch(Exception e){
+            System.out.println(e.getMessage());
+            throw new RuntimeException();
+        }
+    }
+
+
+
+    //4. 로그인 체크
+    public String test(HttpServletRequest request) {
+        Optional<user_tb> member = (Optional<user_tb>) sessionManager.getSession(request);
+
+        if (member == null) {
+            return "home";
+        }
+
+        return "loginHome";
+
+    }
 
 
     ///////////////////////////////////////////////////////////////
