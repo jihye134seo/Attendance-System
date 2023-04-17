@@ -37,15 +37,6 @@ public class AttenderService {
         return userRepository.findAll();
     }
 
-    public String getUser(Integer userId) {
-        return "{\n" +
-                "\t\t\"id\": 1,\n" +
-                "\t\t\"name\": \"김길동\",\n" +
-                "\t\t\"age\": 16,\n" +
-                "\t\t\"학교\": \"길동중\"\n" +
-                "\t}";
-
-    }
     //------------------------실행 테스트-----------------------
 
     //----------------------Project API------------------------

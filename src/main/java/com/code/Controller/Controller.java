@@ -18,7 +18,7 @@ public class Controller {
     private final AttenderService attenderService;
 
     //------------------------실행 테스트-----------------------
-    @GetMapping(value = "api/test")
+    @GetMapping(value = "/api/test")
     public String test() {
         return "{name : 'icecream'}";
     }

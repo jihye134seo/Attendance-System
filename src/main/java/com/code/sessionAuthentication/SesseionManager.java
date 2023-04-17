@@ -17,7 +17,7 @@ public class SesseionManager {
     public static final String SESSION_COOKIE_NAME = "mySessionId";
     private Map<String, Object> sessionStore = new ConcurrentHashMap<>();
 
-    int tempId = 0;
+//    int tempId = 0;
 
     public void createSession(Object value, HttpServletResponse response) {
         //세션 생성
@@ -25,8 +25,10 @@ public class SesseionManager {
         sessionStore.put(sessionId, value);
 
         //쿠키 생성 후 저장
-        Cookie cookie = new Cookie(SESSION_COOKIE_NAME + tempId, sessionId);
-        tempId++;
+        Cookie cookie = new Cookie(SESSION_COOKIE_NAME, sessionId);
+        cookie.setMaxAge(3600);
+        cookie.setPath("/api");
+
         response.addCookie(cookie);
     }
 
