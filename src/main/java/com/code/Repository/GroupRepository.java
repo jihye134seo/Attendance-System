@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -38,11 +39,11 @@ public interface GroupRepository extends JpaRepository<group_tb, Integer> {
     @Query(value = "SELECT * FROM attender.group_tb g where g.gid = :gid", nativeQuery = true)
     group_tb getGroupInfo(Integer gid);
 
-    @Query(value = "SELECT * FROM attender.user_and_history_tb uh WHERE uh.guid = (SELECT gu.guid FROM attender.group_and_user_tb gu WHERE (gu.gid = :gid AND gu.uid = :uid))", nativeQuery = true)
-    Object[] getAttendanceState(Integer gid, Integer uid);
+//    @Query(value = "SELECT * FROM attender.user_and_history_tb uh WHERE uh.guid = (SELECT gu.guid FROM attender.group_and_user_tb gu WHERE (gu.gid = :gid AND gu.uid = :uid))", nativeQuery = true)
+//    Object[] getAttendanceState(Integer gid, Integer uid);
 
-    @Query(value = "SELECT * FROM attender.history_tb h where h.hid = :hid", nativeQuery = true)
-    history_tb getHistoryState(Integer hid);
+//    @Query(value = "SELECT * FROM attender.history_tb h where h.hid = :hid", nativeQuery = true)
+//    history_tb getHistoryState(Integer hid);
 
     //-----------------------------API4 : 출석 코드 생성-----------------------------
     @Modifying
@@ -61,8 +62,8 @@ public interface GroupRepository extends JpaRepository<group_tb, Integer> {
     String getAttendanceCode(Integer gid);
 
     //-----------------------------API6 : 자신이 참여한 그룹 리스트 조회-----------------------------
-    @Query(value = "SELECT * FROM attender.group_and_user_tb g where g.uid = :uid", nativeQuery = true)
-    List<Object[]> getJoinedGroupList(@Param("uid") Integer uid);
+//    @Query(value = "SELECT * FROM attender.group_and_user_tb g where g.uid = :uid", nativeQuery = true)
+//    List<Object[]> getJoinedGroupList(@Param("uid") Integer uid);
     @Query(value = "SELECT * FROM attender.group_tb g where g.gid = :gid", nativeQuery = true)
     group_tb getJoinedGroupInfo(Integer gid);
 
@@ -81,6 +82,13 @@ public interface GroupRepository extends JpaRepository<group_tb, Integer> {
     @Query(value = "SELECT c.cid FROM attender.code_tb c WHERE c.attendance_code = :attendanceCode", nativeQuery = true)
     Integer getFoundCid(String attendanceCode);
 
+
+    @Query(value = "SELECT c.accept_start_time FROM attender.code_tb c WHERE c.cid = :cid", nativeQuery = true)
+    LocalDateTime getAcceptStartTime(Integer cid);
+
+    @Query(value = "SELECT c.accept_end_time FROM attender.code_tb c WHERE c.cid = :cid", nativeQuery = true)
+    LocalDateTime getAcceptEndTime(Integer cid);
+
     @Modifying
     @Query(value = "INSERT INTO attender.history_tb " +
             "(guid, enter_time, cid, create_date_time) " +
@@ -92,6 +100,11 @@ public interface GroupRepository extends JpaRepository<group_tb, Integer> {
             "(hid, guid) " +
             "VALUES ((SELECT LAST_INSERT_ID()), :guid)", nativeQuery = true)
     void insertUserAttendanceToUAH(String guid);
+
+
+
+
+
 
     //------------------------------API9 : 사용자의 출석 상태 Update------------------------------
     @Modifying

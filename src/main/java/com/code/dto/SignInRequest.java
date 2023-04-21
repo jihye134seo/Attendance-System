@@ -1,6 +1,6 @@
 package com.code.dto;
 
-public class LoginRequest {
+public class SignInRequest {
 
     String email;
     String password;

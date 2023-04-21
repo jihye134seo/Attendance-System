@@ -1,23 +1,24 @@
 package com.code.Service;
 
 import com.code.Entity.*;
+import com.code.Repository.*;
 import com.code.dto.GetJoinedGroupResponse;
 import com.code.dto.GroupInfoResponse;
 import com.code.dto.MainPageResponse;
-import com.code.Repository.GroupRepository;
-import com.code.Repository.UserRepository;
 import com.code.dto.SignUpRequest;
 import com.code.sessionAuthentication.SesseionManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.context.annotation.Bean;
 //import org.apache.tomcat.util.json.JSONParser;
 //import org.apache.tomcat.util.json.ParseException;
 //import org.h2.util.json.JSONObject;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 
 import java.util.ArrayList;
@@ -27,10 +28,15 @@ import java.util.UUID;
 
 @AllArgsConstructor
 @org.springframework.stereotype.Service
+@Slf4j
 public class AttenderService {
 
     private UserRepository userRepository;
     private GroupRepository groupRepository;
+    private UserAndHistoryRepository userAndHistoryRepository;
+    private HistoryRepository historyRepository;
+    private GroupAndUserRepository groupAndUserRepository;
+
 
     //------------------------실행 테스트-----------------------
     public List<user_tb> getUserList() {
@@ -41,148 +47,335 @@ public class AttenderService {
 
     //----------------------Project API------------------------
     //API1 : 사용자가 생성한 그룹 리스트 가져오기
-    public List<group_tb> getGroupList(Integer uid) {
-        return groupRepository.getGroupList(uid);
+    public List<group_tb> getGroupList(HttpServletRequest request, HttpServletResponse response, Integer uid) throws IOException {
+
+        //로그인 체크 과정 수행
+        if(authenticationCheck(request).equals("OK")){
+            try{
+                return groupRepository.getGroupList(uid);
+            }catch(Exception e){
+                log.info(e.getMessage());
+                throw new RuntimeException();
+            }
+        }
+        else{
+            response.sendError(401);
+            return null;
+        }
+
     }
 
     //API2 : 그룹 생성 & 초대코드 return
-    public String createGroup(Integer uid, String groupTitle, String groupDetail) {
+    public String createGroup(HttpServletRequest request, HttpServletResponse response, Integer uid, String groupTitle, String groupDetail) throws IOException {
 
-        String inviteCode = UUID.randomUUID().toString();; //랜덤 문자열 생성 : 초대코드
-        groupRepository.createGroup(inviteCode, uid, groupTitle, groupDetail);   //그룹 생성
-        return groupRepository.getInviteCode(); //초대코드 반환
+        if(authenticationCheck(request).equals("OK")){
+            try{
+                String inviteCode = UUID.randomUUID().toString().substring(0, 6);; //랜덤 문자열 생성 : 초대코드
+                groupRepository.createGroup(inviteCode, uid, groupTitle, groupDetail);   //그룹 생성
+                return groupRepository.getInviteCode(); //초대코드 반환
+
+            }catch(Exception e){
+                log.info(e.getMessage());
+                throw new RuntimeException();
+            }
+        }
+        else{
+            response.sendError(401);
+            return null;
+        }
     }
 
     //API3 : 접속한 그룹 정보 조회 & 출석 정보 포함
-    public GroupInfoResponse getGroupInfo(Integer gid, Integer uid) {
+    public GroupInfoResponse getGroupInfo(HttpServletRequest request, HttpServletResponse response, Integer gid, Integer uid) throws IOException {
 
-        group_tb groupInfo = groupRepository.getGroupInfo(gid);
-        var attendanceState = groupRepository.getAttendanceState(gid, uid);
 
-        if(attendanceState.length == 0){
-            return new GroupInfoResponse(groupInfo, "NO");
+        if(authenticationCheck(request).equals("OK")){
+            try{
+                group_tb groupInfo = groupRepository.getGroupInfo(gid);
+                user_and_history_tb attendanceState = userAndHistoryRepository.getAttendanceState(gid, uid);
+
+                if(attendanceState == null){
+                    return new GroupInfoResponse(groupInfo, "NO");
+                }
+                else{
+
+                    history_tb userHistory = historyRepository.getHistoryState(attendanceState.getHid());
+
+                    if(userHistory.getExit_time() == null){
+                        return new GroupInfoResponse(groupInfo, "Enter");
+                    }
+                    else{
+                        return new GroupInfoResponse(groupInfo, "Exit");
+                    }
+
+                }
+
+            }catch(Exception e){
+                log.info(e.getMessage());
+                throw new RuntimeException();
+            }
         }
         else{
-
-            Object[] temp = (Object[])attendanceState[0];
-            history_tb userHistory = groupRepository.getHistoryState((Integer)temp[1]);
-
-            if(userHistory.getExit_time() == null){
-                return new GroupInfoResponse(groupInfo, "Enter");
-            }
-            else{
-                return new GroupInfoResponse(groupInfo, "Exit");
-            }
-
+            response.sendError(401);
+            return null;
         }
+
     }
 
     //API4 : 출석 코드 생성
-    public void putAttendanceCode(Integer gid, LocalDateTime acceptStartTime, LocalDateTime acceptEndTime) {
-        String attendanceCode = RandomStringUtils.randomAlphabetic(20); //랜덤 문자열 생성 : 출석코드
+    public void putAttendanceCode(HttpServletRequest request, HttpServletResponse response, Integer gid, LocalDateTime acceptStartTime, LocalDateTime acceptEndTime) throws IOException {
 
-        groupRepository.insertAttendanceCode(attendanceCode, acceptStartTime, acceptEndTime);
-        groupRepository.putGroupCid(gid);
+        if(authenticationCheck(request).equals("OK")){
+            try{
 
+                String attendanceCode = RandomStringUtils.randomAlphabetic(10); //랜덤 문자열 생성 : 출석코드
+
+                groupRepository.insertAttendanceCode(attendanceCode, acceptStartTime, acceptEndTime);
+                groupRepository.putGroupCid(gid);
+
+                response.setStatus(200);
+
+            }catch(Exception e){
+                log.info(e.getMessage());
+                throw new RuntimeException();
+            }
+
+        }
+        else{
+            response.sendError(401);
+        }
     }
 
     //API5 : 출석 코드 조회
-    public String getAttendanceCode(Integer gid) {
-        return groupRepository.getAttendanceCode(gid);
+    public String getAttendanceCode(HttpServletRequest request, HttpServletResponse response, Integer gid) throws IOException {
+
+        if(authenticationCheck(request).equals("OK")){
+
+            try{
+                return groupRepository.getAttendanceCode(gid);
+            }catch(Exception e){
+                log.info(e.getMessage());
+                throw new RuntimeException();
+            }
+
+        }
+        else{
+            response.sendError(401);
+            return null;
+        }
     }
 
     //API6 : 자신이 참여한 그룹 리스트 조회
-    public List<GetJoinedGroupResponse> getJoinedGroupList(Integer uid) {
+    public List<GetJoinedGroupResponse> getJoinedGroupList(HttpServletRequest request, HttpServletResponse response, Integer uid) throws IOException {
 
-        List<Object[]> joinedGroupList = groupRepository.getJoinedGroupList(uid);
+        if(authenticationCheck(request).equals("OK")){
 
-        ArrayList<GetJoinedGroupResponse> result = new ArrayList<GetJoinedGroupResponse>();
+            try {
 
-        for(int i=0; i < joinedGroupList.size(); i++){
-            Object[] temp = joinedGroupList.get(i);
-            result.add(new GetJoinedGroupResponse(
-                    (Integer)temp[0],
-                    groupRepository.getJoinedGroupInfo((Integer)temp[2])
-            ));
-        }
+                List<group_and_user_tb> joinedGroupList = groupAndUserRepository.getJoinedGroupList(uid);
 
-        return result;
-    }
+                ArrayList<GetJoinedGroupResponse> result = new ArrayList<GetJoinedGroupResponse>();
 
-    //API7 : 메인페이지 - 전체 회원수, 그룹수, 오늘 출석한 사람 수
-    public MainPageResponse getMainPageInfo() {
-        return new MainPageResponse(
-                groupRepository.getAllMemberConut(),
-                groupRepository.getAllGroupCount(),
-                groupRepository.getTodayAttendCount()
-        );
-    }
+                for (int i = 0; i < joinedGroupList.size(); i++) {
+                    group_and_user_tb groupAndUserInfo = joinedGroupList.get(i);
+                    result.add(new GetJoinedGroupResponse(
+                            groupAndUserInfo.getGuid(),
+                            groupRepository.getJoinedGroupInfo(groupAndUserInfo.getGid())
+                    ));
+                }
 
-    //API8 : 사용자의 출석 상태 Insert
-    public String insertUserAttendance(String guid, LocalDateTime enterTime, String attendanceCode) {
+                return result;
+            }
+            catch(Exception e){
+                log.info(e.getMessage());
+                throw new RuntimeException();
+            }
 
-        //0. cid와 일치하는지 유효성 검사 코드를 작성한다.
-
-        Integer groupCid = groupRepository.getGroupCurrentCid(guid);
-        Integer foundCid = groupRepository.getFoundCid(attendanceCode);
-
-        if(groupCid.compareTo(foundCid) == 0) { //올바른 코드가 입력되었다면
-
-//            groupRepository.transactionStart();
-
-            //1. history_tb에 출석정보 추가
-            groupRepository.insertUserAttendanceToHistory(guid, enterTime, groupCid);
-
-            //2. user_and_history_tb에 출석 정보 추가
-            groupRepository.insertUserAttendanceToUAH(guid);
-
-//            groupRepository.commit();
-
-            return "OK";
         }
         else{
-            return "FAIL"; // 올바르지 않은 코드가 입력되었다면.
+            response.sendError(401);
+            return null;
         }
+    }
 
+
+    //API8 : 사용자의 출석 상태 Insert
+    public String insertUserAttendance(HttpServletRequest request, HttpServletResponse response, String guid, LocalDateTime enterTime, String attendanceCode) throws IOException {
+
+        if(authenticationCheck(request).equals("OK")){
+            //0. cid와 일치하는지 유효성 검사 코드를 작성한다.
+
+            try {
+
+                Integer groupCid = groupRepository.getGroupCurrentCid(guid);
+                Integer foundCid = groupRepository.getFoundCid(attendanceCode);
+
+                if(groupCid.compareTo(foundCid) == 0) { //올바른 코드가 입력되었다면
+
+                    //코드의 입력시간이 유효한지 확인한다.
+                    LocalDateTime acceptStartTime = groupRepository.getAcceptStartTime(foundCid);
+                    LocalDateTime acceptEndTime = groupRepository.getAcceptEndTime(foundCid);
+
+                    log.info("Start: {}", acceptStartTime.toString());
+                    log.info("End: {}",acceptEndTime.toString());
+                    log.info("Enter: {}",enterTime.toString());
+
+
+                    log.info(acceptStartTime.isBefore(acceptEndTime) ? "t" : "f");
+                    log.info(acceptStartTime.isBefore(enterTime) ? "t" : "f");
+                    log.info(acceptEndTime.isAfter(enterTime) ? "t" : "f");
+
+
+                    if(acceptStartTime.isBefore(acceptEndTime) &&
+                            acceptStartTime.isBefore(enterTime) &&
+                            acceptEndTime.isAfter(enterTime))
+                    {
+                        //1. history_tb에 출석정보 추가
+                        groupRepository.insertUserAttendanceToHistory(guid, enterTime, groupCid);
+                        //2. user_and_history_tb에 출석 정보 추가
+                        groupRepository.insertUserAttendanceToUAH(guid);
+
+                        return "200 OK";
+                    }
+                    else{
+                        return "Not Valid Time";
+                    }
+                }
+                else{
+                    return "Not Valid Code"; // 올바르지 않은 코드가 입력되었다면.
+                }
+
+            }
+            catch(Exception e){
+                log.info(e.getMessage());
+                throw new RuntimeException();
+            }
+        }
+        else{
+            response.sendError(401);
+            return null;
+        }
     }
 
     //API9 : 사용자의 출석 상태 Update
-    public void updateUserAttendance(String guid, LocalDateTime exitTime) {
-        groupRepository.updateUserAttendance(guid, exitTime);
-    }
+    public void updateUserAttendance(HttpServletRequest request, HttpServletResponse response, String guid, LocalDateTime exitTime) throws IOException {
 
-    //API10 : 그룹 참가
-    public String insertGroupUser(Integer uid, String userCode) {
-
-        //0. 사용자가 입력한 초대 코드가 유효한 코드인지 확인한다.
-        //1. 사용자가 입력한 초대 코드가 유효하지 않다면 FAIL
-        Integer foundGid = groupRepository.getGroupInviteCode(userCode);
-
-        if(foundGid != null) { //올바른 코드가 입력되었다면
-
-            //1.5 이미 사용자가 그룹에 속한 사람이라면
-            if(groupRepository.getIsUserInGroup(uid, foundGid) != null){
-                return "Already Exist";
+        if(authenticationCheck(request).equals("OK")){
+            try {
+                groupRepository.updateUserAttendance(guid, exitTime);
+                response.setStatus(200);
             }
-            else{
-                //2. 사용자가 입력한 초대 코드가 유효하다면 GROUP USER에 INSERT
-                groupRepository.insertGroupUser(uid, foundGid);
-
-                return "OK";
+            catch(Exception e){
+                log.info(e.getMessage());
+                throw new RuntimeException();
             }
         }
         else{
+            response.sendError(401);
+        }
+
+    }
+
+    //API10 : 그룹 참가
+    public String insertGroupUser(HttpServletRequest request, HttpServletResponse response, Integer uid, String userCode) throws IOException {
+
+
+        if(authenticationCheck(request).equals("OK")){
+            //0. 사용자가 입력한 초대 코드가 유효한 코드인지 확인한다.
             //1. 사용자가 입력한 초대 코드가 유효하지 않다면 FAIL
-            return "FAIL"; // 올바르지 않은 코드가 입력되었다면.
+
+            try{
+                Integer foundGid = groupRepository.getGroupInviteCode(userCode);
+
+                if(foundGid != null) { //올바른 코드가 입력되었다면
+
+                    //1.5 이미 사용자가 그룹에 속한 사람이라면
+                    if(groupRepository.getIsUserInGroup(uid, foundGid) != null){
+                        return "Already Exist";
+                    }
+                    else{
+                        //2. 사용자가 입력한 초대 코드가 유효하다면 GROUP USER에 INSERT
+                        groupRepository.insertGroupUser(uid, foundGid);
+
+                        return "200 OK";
+                    }
+                }
+                else{
+                    //1. 사용자가 입력한 초대 코드가 유효하지 않다면 FAIL
+                    return "Not Valid Invite Code"; // 올바르지 않은 코드가 입력되었다면.
+                }
+            }catch(Exception e){
+                log.info(e.getMessage());
+                throw new RuntimeException();
+            }
+
+        }
+        else{
+            response.sendError(401);
+            return null;
+        }
+
+    }
+
+
+    //API11 : 그룹의 회원수
+    public Integer getGroupUserCount(HttpServletRequest request, HttpServletResponse response, Integer gid) throws IOException {
+        if(authenticationCheck(request).equals("OK")){
+            return groupRepository.getGroupUserCount(gid);
+        }
+        else{
+            response.sendError(401);
+            return null;
         }
     }
 
 
 
-    //API11 : 그룹의 회원수
-    public Integer getGroupUserCount(Integer gid) {
-        return groupRepository.getGroupUserCount(gid);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //API7 : 메인페이지 - 전체 회원수, 그룹수, 오늘 출석한 사람 수
+    public MainPageResponse getMainPageInfo() {
+
+        try {
+
+            return new MainPageResponse(
+                    groupRepository.getAllMemberConut(),
+                    groupRepository.getAllGroupCount(),
+                    groupRepository.getTodayAttendCount()
+            );
+        }
+        catch(Exception e){
+            log.info(e.getMessage());
+            throw new RuntimeException();
+        }
     }
+
+
+
+
+
+
+
+
 
 
 
@@ -265,14 +458,14 @@ public class AttenderService {
 
 
     //4. 로그인 체크
-    public String test(HttpServletRequest request) {
+    private String authenticationCheck(HttpServletRequest request) {
         Optional<user_tb> member = (Optional<user_tb>) sessionManager.getSession(request);
 
         if (member == null) {
-            return "home";
+            return "NOT";
         }
 
-        return "loginHome";
+        return "OK";
 
     }
 

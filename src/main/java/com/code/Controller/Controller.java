@@ -6,13 +6,14 @@ import com.code.Service.AttenderService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import org.springframework.validation.BindingResult;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @AllArgsConstructor
+@Slf4j
 public class Controller {
 
     private final AttenderService attenderService;
@@ -27,39 +28,172 @@ public class Controller {
     //----------------------Project API------------------------
     //API1 : 사용자가 생성한 그룹 리스트 가져오기
     @GetMapping(value = "/api/user/{uid}/groups/created")
-    public List<group_tb> getGroupList(@PathVariable String uid) {
-        return attenderService.getGroupList(Integer.parseInt(uid));
+    public List<group_tb> getGroupList(@PathVariable String uid, HttpServletRequest request, HttpServletResponse response) {
+        try{
+            return attenderService.getGroupList(request, response, Integer.parseInt(uid));
+        }
+        catch(Exception e){
+            log.info(e.getMessage());
+            return null;
+        }
     }
 
     //API2 : 그룹 생성 & 초대코드 return
     @PostMapping(value = "/api/group")
-    public String createGroup(@RequestBody CreateGroupRequest createGroupRequest) {
-        return attenderService.createGroup(createGroupRequest.getUid(), createGroupRequest.getGroup_title(), createGroupRequest.getGroup_detail());
+    public String createGroup(@RequestBody CreateGroupRequest createGroupRequest, HttpServletRequest request, HttpServletResponse response) {
+
+        try{
+            return attenderService.createGroup(request, response, createGroupRequest.getUid(), createGroupRequest.getGroup_title(), createGroupRequest.getGroup_detail());
+        }
+        catch(Exception e){
+            log.info(e.getMessage());
+            return null;
+        }
     }
 
     //API3 : 접속한 그룹 정보 조회 & 출석 정보 포함
     @GetMapping(value = "/api/group/{gid}/{uid}")
-    public GroupInfoResponse getGroupInfo(@PathVariable String gid, @PathVariable String uid) {
-        return attenderService.getGroupInfo(Integer.parseInt(gid), Integer.parseInt(uid));
+    public GroupInfoResponse getGroupInfo(@PathVariable String gid, @PathVariable String uid, HttpServletRequest request, HttpServletResponse response) {
+        try{
+            return attenderService.getGroupInfo(request, response, Integer.parseInt(gid), Integer.parseInt(uid));
+        }
+        catch(Exception e){
+            log.info(e.getMessage());
+            return null;
+        }
     }
 
     //API4 : 출석 코드 생성
     @PutMapping(value = "/api/attendance")
-    public void putAttendanceCode(@RequestBody PutAttendanceCodeRequest putAttendanceCodeRequest) {
-        attenderService.putAttendanceCode(putAttendanceCodeRequest.getGid(), putAttendanceCodeRequest.getAcceptStartTime(), putAttendanceCodeRequest.getAcceptEndTime());
+    public void putAttendanceCode(@RequestBody PutAttendanceCodeRequest putAttendanceCodeRequest, HttpServletRequest request, HttpServletResponse response) {
+        try{
+            attenderService.putAttendanceCode(request, response, putAttendanceCodeRequest.getGid(), putAttendanceCodeRequest.getAcceptStartTime(), putAttendanceCodeRequest.getAcceptEndTime());
+        }
+        catch(Exception e){
+            log.info(e.getMessage());
+        }
     }
 
     //API5 : 출석 코드 조회
     @GetMapping(value = "/api/group/{gid}/attendance")
-    public String getAttendanceCode(@PathVariable String gid) {
-        return attenderService.getAttendanceCode(Integer.parseInt(gid));
+    public String getAttendanceCode(@PathVariable String gid, HttpServletRequest request, HttpServletResponse response) {
+        try {
+            return attenderService.getAttendanceCode(request, response, Integer.parseInt(gid));
+        }
+        catch(Exception e){
+            log.info(e.getMessage());
+            return null;
+
+        }
     }
 
     //API6 : 자신이 참여한 그룹 리스트 조회
     @GetMapping(value = "/api/user/{uid}/groups/joined")
-    public List<GetJoinedGroupResponse> getJoinedGroupList(@PathVariable String uid) {
-        return attenderService.getJoinedGroupList(Integer.parseInt(uid));
+    public List<GetJoinedGroupResponse> getJoinedGroupList(@PathVariable String uid, HttpServletRequest request, HttpServletResponse response) {
+        try {
+            return attenderService.getJoinedGroupList(request, response, Integer.parseInt(uid));
+        }
+        catch(Exception e){
+            log.info(e.getMessage());
+            return null;
+
+        }
     }
+
+    //API8 : 사용자의 출석 상태 Insert
+    @PostMapping(value = "/api/user/attendance")
+    public String insertUserAttendance(@RequestBody InsertUserAttendanceRequest insertUserAttendanceRequest, HttpServletRequest request, HttpServletResponse response) {
+        try {
+            return attenderService.insertUserAttendance(request, response, insertUserAttendanceRequest.getGuid(), insertUserAttendanceRequest.getEnter_time(), insertUserAttendanceRequest.getAttendance_code());
+        }
+        catch(Exception e){
+            log.info(e.getMessage());
+            return null;
+
+        }
+    }
+
+    //API9 : 사용자의 출석 상태 Update
+    @PatchMapping(value = "/api/user/attendance")
+    public void updateUserAttendance(@RequestBody UpdateUserAttendanceRequest updateUserAttendanceRequest, HttpServletRequest request, HttpServletResponse response) {
+        try {
+            attenderService.updateUserAttendance(request, response, updateUserAttendanceRequest.getGuid(), updateUserAttendanceRequest.getExit_time());
+
+        }
+        catch(Exception e){
+            log.info(e.getMessage());
+        }
+    }
+
+    //API10 : 그룹 참가
+    @PostMapping(value = "/api/group/join")
+    public String insertGroupUser(@RequestBody InsertGroupUserRequest insertGroupUserRequest, HttpServletRequest request, HttpServletResponse response) {
+        try {
+            return attenderService.insertGroupUser(request, response, insertGroupUserRequest.getUid(), insertGroupUserRequest.getInvite_code());
+        }
+        catch(Exception e){
+            log.info(e.getMessage());
+            return null;
+        }
+    }
+
+    //API11 : 그룹의 회원수
+    @GetMapping(value = "/api/group/{gid}/count")
+    public Integer getGroupUserCount(@PathVariable String gid, HttpServletRequest request, HttpServletResponse response) {
+        try {
+            return attenderService.getGroupUserCount(request, response, Integer.parseInt(gid));
+        }
+        catch(Exception e){
+            log.info(e.getMessage());
+            return null;
+        }
+    }
+
+
+
+
+//    //API12 : 그룹 참여자의 현재 출석 정보 조회
+//    @GetMapping(value = "/api/main")
+//    public MainPageResponse getMainPageInfo() {
+//        return attenderService.getMainPageInfo();
+//    }
+//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     //API7 : 메인페이지 - 전체 회원수, 그룹수, 오늘 출석한 사람 수
     @GetMapping(value = "/api/main")
@@ -67,29 +201,15 @@ public class Controller {
         return attenderService.getMainPageInfo();
     }
 
-    //API8 : 사용자의 출석 상태 Insert
-    @PostMapping(value = "/api/user/attendance")
-    public String insertUserAttendance(@RequestBody InsertUserAttendanceRequest insertUserAttendanceRequest) {
-        return attenderService.insertUserAttendance(insertUserAttendanceRequest.getGuid(), insertUserAttendanceRequest.getEnter_time(), insertUserAttendanceRequest.getAttendance_code());
-    }
 
-    //API9 : 사용자의 출석 상태 Update
-    @PatchMapping(value = "/api/user/attendance")
-    public void updateUserAttendance(@RequestBody UpdateUserAttendanceRequest updateUserAttendanceRequest) {
-        attenderService.updateUserAttendance(updateUserAttendanceRequest.getGuid(), updateUserAttendanceRequest.getExit_time());
-    }
 
-    //API10 : 그룹 참가
-    @PostMapping(value = "/api/group/join")
-    public String insertGroupUser(@RequestBody InsertGroupUserRequest insertGroupUserRequest) {
-        return attenderService.insertGroupUser(insertGroupUserRequest.getUid(), insertGroupUserRequest.getInvite_code());
-    }
 
-    //API11 : 그룹의 회원수
-    @GetMapping(value = "/api/group/{gid}/count")
-    public Integer getGroupUserCount(@PathVariable String gid) {
-        return attenderService.getGroupUserCount(Integer.parseInt(gid));
-    }
+
+
+
+
+
+
 
 
     /////////////////////////////////////////////////////////////////
@@ -106,8 +226,8 @@ public class Controller {
 
     // 2. 로그인
     @PostMapping(value = "/api/user/signin")
-    public String signIn(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
-        return attenderService.signIn(loginRequest.getEmail(), loginRequest.getPassword(), response);
+    public String signIn(@RequestBody SignInRequest signInRequest, HttpServletResponse response) {
+        return attenderService.signIn(signInRequest.getEmail(), signInRequest.getPassword(), response);
     }
 
 
@@ -119,11 +239,11 @@ public class Controller {
 
 
     //4. 로그인 체크
-    @GetMapping("/api/user/check")
-    public String test(HttpServletRequest request) {
-        return attenderService.test(request);
-    }
-
+//    @GetMapping("/api/user/check")
+//    public String test(HttpServletRequest request) {
+//        return attenderService.test(request);
+//    }
+//
 
 
 
