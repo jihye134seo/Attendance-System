@@ -2,10 +2,7 @@ package com.code.Service;
 
 import com.code.Entity.*;
 import com.code.Repository.*;
-import com.code.dto.GetJoinedGroupResponse;
-import com.code.dto.GroupInfoResponse;
-import com.code.dto.MainPageResponse;
-import com.code.dto.SignUpRequest;
+import com.code.dto.*;
 import com.code.sessionAuthentication.SesseionManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,10 +18,7 @@ import org.springframework.context.annotation.Bean;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @AllArgsConstructor
 @org.springframework.stereotype.Service
@@ -45,7 +39,85 @@ public class AttenderService {
 
     //------------------------실행 테스트-----------------------
 
-    //----------------------Project API------------------------
+    //----------------------------------------------Attender API------------------------------------------------
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////      Authentication      ////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    SesseionManager sessionManager;
+
+    // 1. 회원가입
+    public String signUp(SignUpRequest signUpRequest) {
+
+        try{
+            userRepository.save(user_tb.builder()
+                    .password(signUpRequest.getPassword())
+                    .real_name(signUpRequest.getReal_name())
+                    .email_address(signUpRequest.getEmail())
+                    .nick_name(signUpRequest.getNick_name())
+                    .role('U')
+                    .create_date_time(LocalDateTime.now())
+                    .build());
+
+            return "200 OK";
+
+        }
+        catch(Exception e){
+            System.out.println(e.getMessage());
+            throw new RuntimeException();
+        }
+
+    }
+
+    // 2. 로그인
+    public String signIn(String email, String password, HttpServletResponse response) {
+
+        var temp = userRepository.checkSignInValidation(email, password);
+
+        try{
+            if(temp != null){
+                sessionManager.createSession(userRepository.findById(temp), response);
+                return "200 OK";
+            }
+            else{
+                return "Not a Member";
+            }
+        }
+        catch(Exception e){
+            System.out.println(e.getMessage());
+            throw new RuntimeException();
+        }
+    }
+
+    // 3. 로그아웃
+    public String signOut(HttpServletResponse response, HttpServletRequest request) {
+
+        try{
+            sessionManager.expire(request);
+            return "200 OK";
+        }
+        catch(Exception e){
+            System.out.println(e.getMessage());
+            throw new RuntimeException();
+        }
+    }
+
+    //4. 로그인 체크
+    private String authenticationCheck(HttpServletRequest request) {
+        Optional<user_tb> member = (Optional<user_tb>) sessionManager.getSession(request);
+
+        if (member == null) {
+            return "NOT";
+        }
+        return "OK";
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     //API1 : 사용자가 생성한 그룹 리스트 가져오기
     public List<group_tb> getGroupList(HttpServletRequest request, HttpServletResponse response, Integer uid) throws IOException {
 
@@ -88,7 +160,6 @@ public class AttenderService {
     //API3 : 접속한 그룹 정보 조회 & 출석 정보 포함
     public GroupInfoResponse getGroupInfo(HttpServletRequest request, HttpServletResponse response, Integer gid, Integer uid) throws IOException {
 
-
         if(authenticationCheck(request).equals("OK")){
             try{
                 group_tb groupInfo = groupRepository.getGroupInfo(gid);
@@ -119,7 +190,6 @@ public class AttenderService {
             response.sendError(401);
             return null;
         }
-
     }
 
     //API4 : 출석 코드 생성
@@ -190,7 +260,6 @@ public class AttenderService {
                 log.info(e.getMessage());
                 throw new RuntimeException();
             }
-
         }
         else{
             response.sendError(401);
@@ -198,6 +267,22 @@ public class AttenderService {
         }
     }
 
+    //API7 : 메인페이지 - 전체 회원수, 그룹수, 오늘 출석한 사람 수
+    public MainPageResponse getMainPageInfo() {
+
+        try {
+
+            return new MainPageResponse(
+                    groupRepository.getAllMemberConut(),
+                    groupRepository.getAllGroupCount(),
+                    groupRepository.getTodayAttendCount()
+            );
+        }
+        catch(Exception e){
+            log.info(e.getMessage());
+            throw new RuntimeException();
+        }
+    }
 
     //API8 : 사용자의 출석 상태 Insert
     public String insertUserAttendance(HttpServletRequest request, HttpServletResponse response, String guid, LocalDateTime enterTime, String attendanceCode) throws IOException {
@@ -215,16 +300,6 @@ public class AttenderService {
                     //코드의 입력시간이 유효한지 확인한다.
                     LocalDateTime acceptStartTime = groupRepository.getAcceptStartTime(foundCid);
                     LocalDateTime acceptEndTime = groupRepository.getAcceptEndTime(foundCid);
-
-                    log.info("Start: {}", acceptStartTime.toString());
-                    log.info("End: {}",acceptEndTime.toString());
-                    log.info("Enter: {}",enterTime.toString());
-
-
-                    log.info(acceptStartTime.isBefore(acceptEndTime) ? "t" : "f");
-                    log.info(acceptStartTime.isBefore(enterTime) ? "t" : "f");
-                    log.info(acceptEndTime.isAfter(enterTime) ? "t" : "f");
-
 
                     if(acceptStartTime.isBefore(acceptEndTime) &&
                             acceptStartTime.isBefore(enterTime) &&
@@ -279,7 +354,6 @@ public class AttenderService {
     //API10 : 그룹 참가
     public String insertGroupUser(HttpServletRequest request, HttpServletResponse response, Integer uid, String userCode) throws IOException {
 
-
         if(authenticationCheck(request).equals("OK")){
             //0. 사용자가 입력한 초대 코드가 유효한 코드인지 확인한다.
             //1. 사용자가 입력한 초대 코드가 유효하지 않다면 FAIL
@@ -314,14 +388,20 @@ public class AttenderService {
             response.sendError(401);
             return null;
         }
-
     }
-
 
     //API11 : 그룹의 회원수
     public Integer getGroupUserCount(HttpServletRequest request, HttpServletResponse response, Integer gid) throws IOException {
+
         if(authenticationCheck(request).equals("OK")){
-            return groupRepository.getGroupUserCount(gid);
+
+            try{
+                return groupRepository.getGroupUserCount(gid);
+            }
+            catch(Exception e){
+                throw new RuntimeException();
+            }
+
         }
         else{
             response.sendError(401);
@@ -329,149 +409,68 @@ public class AttenderService {
         }
     }
 
+    //API12 : 그룹 참여자의 현재 출석 정보 조회
+    public List<GetGroupMembersAttendanceStateResponse> getGroupMembersAttendanceState(HttpServletRequest request, HttpServletResponse response, Integer gid) throws IOException {
 
+        if(authenticationCheck(request).equals("OK")){
 
+            try{
+                List<group_and_user_tb> getJoinedMemberList = groupAndUserRepository.getJoinedMemberList(gid);
+                List<GetGroupMembersAttendanceStateResponse> result = new LinkedList<>();
 
+                for(int i=0; i<getJoinedMemberList.size(); i++){
 
+                    Integer guid = getJoinedMemberList.get(i).getGuid();
+                    Integer uid = getJoinedMemberList.get(i).getUid();
+                    user_tb userInfo = userRepository.getUserInfo(uid);
 
+                    Integer nowHid = userAndHistoryRepository.getGroupMemberNowState(guid);
 
+                    if(nowHid != null){
 
+                        history_tb userNowHistory = historyRepository.getHistoryState(nowHid);
 
+                        if(userNowHistory.getExit_time() == null && userNowHistory.getAttendance_state() == null){
+                            result.add(GetGroupMembersAttendanceStateResponse
+                                    .builder()
+                                    .user(userInfo)
+                                    .state("Enter")
+                                    .build());
+                        }
+                        else{
+                            result.add(GetGroupMembersAttendanceStateResponse
+                                    .builder()
+                                    .user(userInfo)
+                                    .state("Exit")
+                                    .build());
+                        }
 
+                    }
+                    else{
+                        result.add(GetGroupMembersAttendanceStateResponse
+                                .builder()
+                                .user(userInfo)
+                                .state("Not Entered")
+                                .build());
 
+                    }
+                }
 
+                return result;
 
-
-
-
-
-
-
-
-
-
-
-
-    //API7 : 메인페이지 - 전체 회원수, 그룹수, 오늘 출석한 사람 수
-    public MainPageResponse getMainPageInfo() {
-
-        try {
-
-            return new MainPageResponse(
-                    groupRepository.getAllMemberConut(),
-                    groupRepository.getAllGroupCount(),
-                    groupRepository.getTodayAttendCount()
-            );
-        }
-        catch(Exception e){
-            log.info(e.getMessage());
-            throw new RuntimeException();
-        }
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /////////////////////////////////////////////////////////////////
-    //////////////////      Authentication      /////////////////////
-    /////////////////////////////////////////////////////////////////
-
-    // 1. 회원가입
-    public String signUp(SignUpRequest signUpRequest) {
-
-        try{
-            userRepository.save(user_tb.builder()
-                    .password(signUpRequest.getPassword())
-                    .real_name(signUpRequest.getReal_name())
-                    .email_address(signUpRequest.getEmail())
-                    .nick_name(signUpRequest.getNick_name())
-                    .role('U')
-                    .create_date_time(LocalDateTime.now())
-                    .build());
-
-
-            return "200 OK";
-
-        }
-        catch(Exception e){
-            System.out.println(e.getMessage());
-            throw new RuntimeException();
-        }
-
-    }
-
-
-
-
-    SesseionManager sessionManager;
-
-    // 2. 로그인
-    public String signIn(String email, String password, HttpServletResponse response) {
-
-        var temp = userRepository.checkSignInValidation(email, password);
-
-
-        try{
-            if(temp != null){
-                sessionManager.createSession(userRepository.findById(temp), response);
-                return "200 OK";
-
-            }
-            else{
-                return "Not a Member";
+            }catch(Exception e){
+                log.info(e.getMessage());
+                throw new RuntimeException();
             }
         }
-        catch(Exception e){
-            System.out.println(e.getMessage());
-            throw new RuntimeException();
+        else{
+            response.sendError(401);
+            return null;
         }
-
-
 
     }
 
 
-    // 3. 로그아웃
-    public String signOut(HttpServletResponse response, HttpServletRequest request) {
 
-        try{
-            sessionManager.expire(request);
-            return "200 OK";
-        }
-        catch(Exception e){
-            System.out.println(e.getMessage());
-            throw new RuntimeException();
-        }
-    }
-
-
-
-    //4. 로그인 체크
-    private String authenticationCheck(HttpServletRequest request) {
-        Optional<user_tb> member = (Optional<user_tb>) sessionManager.getSession(request);
-
-        if (member == null) {
-            return "NOT";
-        }
-
-        return "OK";
-
-    }
-
-
-    ///////////////////////////////////////////////////////////////
-
-
-    //----------------------Project API------------------------
+    //----------------------------------------------Attender API------------------------------------------------
 }

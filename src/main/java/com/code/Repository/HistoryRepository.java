@@ -9,4 +9,8 @@ public interface HistoryRepository extends JpaRepository<history_tb, Integer> {
 
     @Query(value = "SELECT * FROM attender.history_tb h where h.hid = :hid", nativeQuery = true)
     history_tb getHistoryState(Integer hid);
+
+
+
+
 }

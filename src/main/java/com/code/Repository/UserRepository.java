@@ -13,4 +13,7 @@ public interface UserRepository extends JpaRepository<user_tb, Integer> {
     Integer checkSignInValidation(String email, String password);
 
 
+    @Query(value = "SELECT * FROM attender.user_tb u WHERE u.uid = :uid", nativeQuery = true)
+    user_tb getUserInfo(Integer uid);
+
 }

@@ -10,4 +10,8 @@ public interface UserAndHistoryRepository extends JpaRepository<user_and_history
     @Query(value = "SELECT * FROM attender.user_and_history_tb uh WHERE uh.guid = (SELECT gu.guid FROM attender.group_and_user_tb gu WHERE (gu.gid = :gid AND gu.uid = :uid))", nativeQuery = true)
     user_and_history_tb getAttendanceState(Integer gid, Integer uid);
 
+
+    @Query(value = "SELECT uh.hid FROM attender.user_and_history_tb uh WHERE uh.guid = :guid", nativeQuery = true)
+    Integer getGroupMemberNowState(Integer guid);
+
 }

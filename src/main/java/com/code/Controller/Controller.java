@@ -25,7 +25,36 @@ public class Controller {
     }
     //------------------------실행 테스트-----------------------
 
-    //----------------------Project API------------------------
+
+    //----------------------------------------------Attender API------------------------------------------------
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////      Authentication      ////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // 1. 회원가입
+    @PostMapping(value = "/api/user/signup")
+    public String signUp(@RequestBody SignUpRequest signUpRequest) {
+        return attenderService.signUp(signUpRequest);
+    }
+
+    // 2. 로그인
+    @PostMapping(value = "/api/user/signin")
+    public String signIn(@RequestBody SignInRequest signInRequest, HttpServletResponse response) {
+        return attenderService.signIn(signInRequest.getEmail(), signInRequest.getPassword(), response);
+    }
+
+    // 3. 로그아웃
+    @PostMapping("/api/user/signout")
+    public String signOut(HttpServletResponse response, HttpServletRequest request) {
+        return attenderService.signOut(response, request);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
     //API1 : 사용자가 생성한 그룹 리스트 가져오기
     @GetMapping(value = "/api/user/{uid}/groups/created")
     public List<group_tb> getGroupList(@PathVariable String uid, HttpServletRequest request, HttpServletResponse response) {
@@ -100,6 +129,12 @@ public class Controller {
         }
     }
 
+    //API7 : 메인페이지 - 전체 회원수, 그룹수, 오늘 출석한 사람 수
+    @GetMapping(value = "/api/main")
+    public MainPageResponse getMainPageInfo() {
+        return attenderService.getMainPageInfo();
+    }
+
     //API8 : 사용자의 출석 상태 Insert
     @PostMapping(value = "/api/user/attendance")
     public String insertUserAttendance(@RequestBody InsertUserAttendanceRequest insertUserAttendanceRequest, HttpServletRequest request, HttpServletResponse response) {
@@ -149,122 +184,19 @@ public class Controller {
         }
     }
 
+    //API12 : 그룹 참여자의 현재 출석 정보 조회
+    @GetMapping(value = "/api/group/{gid}")
+    public List<GetGroupMembersAttendanceStateResponse> getGroupMembersAttendanceState(@PathVariable String gid, HttpServletRequest request, HttpServletResponse response) {
 
-
-
-//    //API12 : 그룹 참여자의 현재 출석 정보 조회
-//    @GetMapping(value = "/api/main")
-//    public MainPageResponse getMainPageInfo() {
-//        return attenderService.getMainPageInfo();
-//    }
-//
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //API7 : 메인페이지 - 전체 회원수, 그룹수, 오늘 출석한 사람 수
-    @GetMapping(value = "/api/main")
-    public MainPageResponse getMainPageInfo() {
-        return attenderService.getMainPageInfo();
+        try {
+            return attenderService.getGroupMembersAttendanceState(request, response, Integer.parseInt(gid));
+        }
+        catch(Exception e){
+            log.info(e.getMessage());
+            return null;
+        }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-    /////////////////////////////////////////////////////////////////
-    //////////////////      Authentication      /////////////////////
-    /////////////////////////////////////////////////////////////////
-
-    // 1. 회원가입
-    @PostMapping(value = "/api/user/signup")
-    public String signUp(@RequestBody SignUpRequest signUpRequest) {
-        return attenderService.signUp(signUpRequest);
-    }
-
-
-
-    // 2. 로그인
-    @PostMapping(value = "/api/user/signin")
-    public String signIn(@RequestBody SignInRequest signInRequest, HttpServletResponse response) {
-        return attenderService.signIn(signInRequest.getEmail(), signInRequest.getPassword(), response);
-    }
-
-
-    // 3. 로그아웃
-    @PostMapping("/api/user/signout")
-    public String signOut(HttpServletResponse response, HttpServletRequest request) {
-        return attenderService.signOut(response, request);
-    }
-
-
-    //4. 로그인 체크
-//    @GetMapping("/api/user/check")
-//    public String test(HttpServletRequest request) {
-//        return attenderService.test(request);
-//    }
-//
-
-
-
-    ///////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-    //----------------------Project API------------------------
-
-
-
-
-
-
-
-
-
+    //----------------------------------------------Attender API------------------------------------------------
 
 }

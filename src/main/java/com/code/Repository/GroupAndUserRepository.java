@@ -12,4 +12,8 @@ public interface GroupAndUserRepository extends JpaRepository<group_and_user_tb,
     @Query(value = "SELECT * FROM attender.group_and_user_tb g where g.uid = :uid", nativeQuery = true)
     List<group_and_user_tb> getJoinedGroupList(@Param("uid") Integer uid);
 
+
+    @Query(value = "SELECT * FROM attender.group_and_user_tb g where g.gid = :gid", nativeQuery = true)
+    List<group_and_user_tb> getJoinedMemberList(@Param("gid") Integer gid);
+
 }
