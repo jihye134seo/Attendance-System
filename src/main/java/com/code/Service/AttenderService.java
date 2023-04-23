@@ -37,6 +37,11 @@ public class AttenderService {
         return userRepository.findAll();
     }
 
+    public Optional<user_tb> dbTest(String uid) {
+        return userRepository.findById(Integer.parseInt(uid));
+    }
+
+
     //------------------------실행 테스트-----------------------
 
     //----------------------------------------------Attender API------------------------------------------------
@@ -469,8 +474,6 @@ public class AttenderService {
         }
 
     }
-
-
 
     //----------------------------------------------Attender API------------------------------------------------
 }
